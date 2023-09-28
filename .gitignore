@@ -2,10 +2,10 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/
-/src/.vs/
+/.vs
+/src/.vs
+/src/packages
 
 /src/FastRawSelector/bin/Debug
 /src/FastRawSelector/bin/Release
 /src/FastRawSelector/obj
-/src/packages
