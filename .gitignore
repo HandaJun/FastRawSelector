@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/FastRawSelector/bin/Debug
+/src/FastRawSelector/bin/Release
+/src/FastRawSelector/obj

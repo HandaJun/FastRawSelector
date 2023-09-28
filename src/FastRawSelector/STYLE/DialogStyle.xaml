@@ -1,0 +1,116 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:local="clr-namespace:FastRawSelector"
+                    xmlns:model="clr-namespace:FastRawSelector.MODEL"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib"
+                    >
+    <!-- Dialog for errors -->
+    <DataTemplate DataType="{x:Type model:ErrorNotificationMessage}">
+        <StackPanel Margin="20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <materialDesign:PackIcon Kind="Error"
+                                                 Height="48"
+                                                 Width="48"
+                                                 Margin="20, 25, 20, 20"
+                                                 Grid.Column="0" />
+                <StackPanel Margin="20"
+                                    Grid.Column="1"
+                                    MinWidth="300">
+                    <TextBlock Text="{Binding Title}"
+                                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"></TextBlock>
+                    <TextBlock Text="{Binding Message}"
+                                       Margin="0,20,0,0"></TextBlock>
+                </StackPanel>
+            </Grid>
+            <Button Content="OK"
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"></Button>
+        </StackPanel>
+    </DataTemplate>
+
+
+    <!-- Dialog for info -->
+    <DataTemplate DataType="{x:Type model:InfoNotificationMessage}">
+        <StackPanel Margin="20"
+                            Grid.Column="1"
+                            MinWidth="300">
+            <TextBlock Text="{Binding Title}"
+                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"></TextBlock>
+            <TextBlock Text="{Binding Message}"
+                               Margin="0,10,0,20"></TextBlock>
+            <Button Content="OK"
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"></Button>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type model:ConfirmNotificationMessage}">
+        <StackPanel Grid.Column="1" MinWidth="200"
+                            Margin="30">
+            <TextBlock Text="{Binding Title}"
+                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"></TextBlock>
+            <TextBlock Text="{Binding Message}"
+                               Margin="0,10,0,20"></TextBlock>
+            <StackPanel Margin="0,10,0,0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                <Button Content="OK"
+                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                MinWidth="75">
+                    <Button.CommandParameter>
+                        <s:Boolean>
+                            true
+                        </s:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Content="Cancel"
+                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                Margin="10,0,0,0"
+                                MinWidth="75">
+                    <Button.CommandParameter>
+                        <s:Boolean>
+                            false
+                        </s:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type model:NewProjectViewModel}">
+        <StackPanel DataContext="{Binding .}"
+                            MinWidth="200"
+                            Margin="30">
+            <TextBlock Text="Project name:"
+                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"></TextBlock>
+            <TextBox Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,5,0,0"></TextBox>
+            <StackPanel Margin="0,10,0,0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                <Button Content="OK"
+                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                MinWidth="75">
+                    <Button.CommandParameter>
+                        <s:Boolean>
+                            true
+                        </s:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Content="Cancel"
+                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                Margin="10,0,0,0"
+                                MinWidth="75">
+                    <Button.CommandParameter>
+                        <s:Boolean>
+                            false
+                        </s:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

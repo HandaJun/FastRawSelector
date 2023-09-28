@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+	<log4net>
+		<!-- Appender 設定 -->
+		<!-- DEBUG level -->
+		<appender name="DebugAppender" type="log4net.Appender.RollingFileAppender">
+			<param name="File" value=".\logs\DEBUG" />
+			<param name="AppendToFile" value="true" />
+			<param name="RollingStyle" value="Date" />
+			<param name="StaticLogFileName" value="false" />
+			<param name="DatePattern" value="_yyyyMMdd'.log'" />
+			<layout type="log4net.Layout.PatternLayout">
+				<param name="ConversionPattern" value="%date{ISO8601} [ %-5level] %message%n" />
+			</layout>
+			<filter type="log4net.Filter.LevelRangeFilter">
+				<levelMin value="DEBUG" />
+				<levelMax value="DEBUG" />
+			</filter>
+		</appender>
+
+		<!-- INFO/WARN level -->
+		<appender name="InfoWarnAppender" type="log4net.Appender.RollingFileAppender">
+			<param name="File" value=".\logs\INFO" />
+			<param name="AppendToFile" value="true" />
+			<param name="RollingStyle" value="Date" />
+			<param name="StaticLogFileName" value="false" />
+			<param name="DatePattern" value="_yyyyMMdd'.log'" />
+			<layout type="log4net.Layout.PatternLayout">
+				<param name="ConversionPattern" value="%date{ISO8601} [ %-5level] %message%n" />
+			</layout>
+			<filter type="log4net.Filter.LevelRangeFilter">
+				<levelMin value="INFO" />
+				<levelMax value="WARN" />
+			</filter>
+		</appender>
+
+		<!-- ERROR/FATAL level -->
+		<appender name="ErrorFatalAppender" type="log4net.Appender.RollingFileAppender">
+			<param name="File" value=".\logs\ERROR" />
+			<param name="AppendToFile" value="true" />
+			<param name="RollingStyle" value="Date" />
+			<param name="StaticLogFileName" value="false" />
+			<param name="DatePattern" value="_yyyyMMdd'.log'" />
+			<layout type="log4net.Layout.PatternLayout">
+				<param name="ConversionPattern" value="%date{ISO8601} [ %-5level] %message%n" />
+			</layout>
+			<filter type="log4net.Filter.LevelRangeFilter">
+				<levelMin value="ERROR" />
+				<levelMax value="FATAL" />
+			</filter>
+		</appender>
+
+		<!--　Appender 指定 -->
+		<root>
+			<level value="INFO" />
+			<appender-ref ref="DebugAppender" />
+			<appender-ref ref="InfoWarnAppender" />
+			<appender-ref ref="ErrorFatalAppender" />
+		</root>
+
+	</log4net>
+</configuration>

@@ -1,0 +1,145 @@
+﻿<Window x:Class="FastRawSelector.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FastRawSelector"
+        xmlns:control="clr-namespace:FastRawSelector.CONTROL"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" 
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="18"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"       
+        Background="{DynamicResource MaterialDesignPaper}"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        WindowStartupLocation="CenterScreen" WindowState="Normal"
+        Title="FastRawSelector" Height="700" Width="1200" 
+        MinHeight="500" MinWidth="500"
+        AllowDrop="True" Drop="Window_Drop" KeyDown="Window_KeyDown"
+        Closing="Window_Closing" Topmost="False">
+    <Window.Resources>
+        <Storyboard x:Key="WaitStoryboard">
+            <DoubleAnimation
+                Storyboard.TargetName="Wait"
+                Storyboard.TargetProperty="(Label.RenderTransform).(RotateTransform.Angle)"
+                From="0"
+                To="360"
+                Duration="0:0:1"
+                RepeatBehavior="Forever" />
+        </Storyboard>
+    </Window.Resources>
+    <Grid Background="#333">
+        <materialDesign:DialogHost Identifier="RootDialog"
+                            CloseOnClickAway="True">
+            <Grid>
+                <Grid>
+                    <Border VerticalAlignment="Top" Height="48" Background="#01000000" MouseEnter="TopBd_MouseEnter"/>
+                    <Border x:Name="SelectImageFolderBt" Margin="0,48,0,0" 
+                            Background="#01000000" MouseEnter="SelectImageFolderBt_MouseEnter">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Border Background="#19FFFFFF" 
+                                    Height="300" Width="300" 
+                                    CornerRadius="300"
+                                    MouseUp="SelectImageFolderBt_MouseUp" Cursor="Hand">    
+                                <iconPacks:PackIconBoxIcons x:Name="DropIcon" Kind="RegularDownload" 
+                                                            Width="140" Height="140" Foreground="#0097A7"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="클릭 또는 파일을 끌어놓으세요" Margin="20" Foreground="Gray"/>
+                        </StackPanel>
+                    </Border>
+                    <control:GridViewControl x:Name="GridViewCtrl" Visibility="Collapsed"/>
+                    <control:SingleViewControl x:Name="SingleViewCtrl" Visibility="Collapsed"/>
+                    <control:FullViewControl x:Name="FullViewCtrl" Visibility="Collapsed"/>
+                </Grid>
+                <Grid x:Name="MenuBar" Visibility="Visible" 
+                      VerticalAlignment="Top" Height="48"
+                      Panel.ZIndex="10" Background="#66333333"
+                      >
+                    <StackPanel Orientation="Horizontal">
+                        <Menu Style="{StaticResource MaterialDesignMenu}" VerticalContentAlignment="Center" Focusable="False">
+                            <MenuItem Header="파일" VerticalContentAlignment="Center" Focusable="False" Style="{StaticResource MaterialDesignMenuItem}">
+                                <MenuItem Header="열기" Click="FolderOpenBt_Click" InputGestureText="Ctrl + O"/>
+                                <MenuItem Header="새로고침" Click="RefreshBt_Click" InputGestureText="F5"/>
+                                <Separator/>
+                                <!--<MenuItem Header="설정" Click="SettingBt_Click" InputGestureText="Ctrl + ,"/>-->
+                                <MenuItem Header="종료" Click="ExitBt_Click" InputGestureText="Ctrl + W"/>
+                            </MenuItem>
+                            <MenuItem Header="편집" VerticalContentAlignment="Center" Focusable="False" Style="{StaticResource MaterialDesignMenuItem}">
+                                <MenuItem Header="전체선택해제" Click="AllDeselectBt_Click"/>
+                                <Separator/>
+                                <MenuItem Header="섬네일추출" Click="ExportThumbnailBt_Click" InputGestureText="Ctrl + E"/>
+                                <MenuItem Header="RAW파일복사" Click="RawCopyBt_Click" InputGestureText="Ctrl + R"/>
+                                <!--<MenuItem Header="분류" Click="FolderDivisionBt_Click" InputGestureText="Ctrl + D" IsEnabled="False"/>-->
+                                <!--<MenuItem Header="EXIF변경" Click="ExifChangeBt_Click" InputGestureText="Ctrl + I" IsEnabled="False"/>-->
+                            </MenuItem>
+                            <MenuItem Header="도움말" VerticalContentAlignment="Center" Focusable="False" Style="{StaticResource MaterialDesignMenuItem}">
+                                <MenuItem Header="도움말보기" Click="AllDeselectBt_Click"/>
+                            </MenuItem>
+                        </Menu>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Grid>
+                            <Grid Margin="5" x:Name="LoadingGrid" Visibility="Collapsed">
+                                <ProgressBar x:Name="LoadingPb" Height="5" Width="300" Value="0" Maximum="100"/>
+                            </Grid>
+                        </Grid>
+
+                        <Border x:Name="SelectedBd" Width="30" Height="30" 
+                                CornerRadius="30" Background="#0097A7"
+                                Margin="20,0" Visibility="Collapsed">
+
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,15,0">
+
+                        <Button x:Name="GridViewBt" Width="40" Padding="5" Height="40" Visibility="Collapsed"
+                                Click="GridViewBt_Click"
+                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                            <Button.Content>
+                                <iconPacks:PackIconBoxIcons x:Name="GridViewIcon" Kind="RegularGrid" 
+                                                            Width="25" Height="25" Foreground="White" 
+                                                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="SingleViewBt" Width="40" Padding="5" Height="40" 
+                                Click="SingleViewBt_Click" ToolTip="일반화면모드(F)"
+                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                            <Button.Content>
+                                <iconPacks:PackIconBoxIcons x:Name="SingleViewIcon" Kind="RegularSquare" 
+                                                            Width="25" Height="25" Foreground="#0097A7"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="FullViewBt" Width="40" Padding="5" Height="40" 
+                                Click="FullViewBt_Click" ToolTip="전체화면모드(F)"
+                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                            <Button.Content>
+                                <iconPacks:PackIconBoxIcons x:Name="FullViewIcon" Kind="RegularFullscreen" 
+                                                            Width="25" Height="25" Foreground="White"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </materialDesign:DialogHost>
+        <Border x:Name="LoadingBd" Background="#90000000" Visibility="Collapsed">
+            <Label Name="Wait" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5, 0.5">
+                <Label.RenderTransform>
+                    <RotateTransform Angle="0" />
+                </Label.RenderTransform>
+                <Label.Content>
+                    <materialDesign:PackIcon Kind="Loading" 
+                                            Width="150" Height="150" 
+                                            Foreground="White"
+                                            >
+                    </materialDesign:PackIcon>
+                </Label.Content>
+            </Label>
+        </Border>
+    </Grid>
+</Window>
