@@ -4,8 +4,8 @@
 
 /.vs/
 /src/.vs/
-/src/package/
 
 /src/FastRawSelector/bin/Debug
 /src/FastRawSelector/bin/Release
 /src/FastRawSelector/obj
+/src/packages
