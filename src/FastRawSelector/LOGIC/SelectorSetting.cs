@@ -8,12 +8,12 @@ namespace FastRawSelector.LOGIC
     [Serializable]
     public class SelectorSetting
     {
-        public static string Location = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FastRawSelector.yaml");
+        public static string Location = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FastRawSelector.dat");
         public HashSet<string> SelectedSet { get; set; } = new HashSet<string>();
         public static SelectorSetting Load(string path)
         {
 
-            Location = Path.Combine(path, "FastRawSelector.yaml");
+            Location = Path.Combine(path, "FastRawSelector.dat");
 
             if (!File.Exists(Location))
                 using (var fs = File.Create(Location)) { }
