@@ -22,6 +22,7 @@ namespace FastRawSelector
 
         bool IsFullScreen = false;
         private WindowState agoWindowState = WindowState.Maximized;
+        string OriginalTitle = "";
 
         public MainWindow(string[] args)
         {
@@ -34,7 +35,9 @@ namespace FastRawSelector
             Common.Main = this;
             ((Storyboard)FindResource("WaitStoryboard")).Begin();
 
-            Title += Common.GetVersion(Application.ResourceAssembly, " Beta ", 3);
+            OriginalTitle = Title + Common.GetVersion(Application.ResourceAssembly, " Beta ", 3);
+            Title = OriginalTitle;
+
             LoadingGrid.Visibility = Visibility.Collapsed;
             if (Args.Length != 0)
             {
@@ -207,7 +210,7 @@ namespace FastRawSelector
                     //case Key.OemComma:
                     //    SettingBt_Click(null, null);
                     //    break;
-                    case Key.W:
+                    case Key.Q:
                         Close();
                         break;
                     case Key.E:
@@ -215,6 +218,9 @@ namespace FastRawSelector
                         break;
                     case Key.R:
                         RawCopyBt_Click(null, null);
+                        break;
+                    case Key.S:
+                        OnlySelectedShowBt_Click(null, null);
                         break;
                     default:
                         break;
@@ -423,6 +429,22 @@ namespace FastRawSelector
         {
             LoadImage.AllDeselect();
 
+        }
+
+        private void OnlySelectedShowBt_Click(object sender, RoutedEventArgs e)
+        {
+            Common.IsOnlySelectedShow = !Common.IsOnlySelectedShow;
+            if (Common.IsOnlySelectedShow)
+            {
+                OnlySelectedShowBt.Header = "모든 사진 보기";
+                Title = OriginalTitle + " (선택한 사진만 보기)";
+            }
+            else
+            {
+                OnlySelectedShowBt.Header = "선택한 사진만 보기";
+                Title = OriginalTitle;
+            }
+            
         }
     }
 }

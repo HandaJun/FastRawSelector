@@ -97,6 +97,16 @@ namespace FastRawSelector.CONTROL
             LoadImage.ChangeExif();
         }
 
+        private void PrevBt_Click(object sender, RoutedEventArgs e)
+        {
+            LoadImage.PrevImage();
+        }
+
+        private void NextBt_Click(object sender, RoutedEventArgs e)
+        {
+            LoadImage.NextIamge();
+        }
+
         //public void SetMiniImg()
         //{
         //    _objectItems.Clear();

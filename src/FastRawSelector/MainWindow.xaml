@@ -43,7 +43,7 @@
                             <Border Background="#19FFFFFF" 
                                     Height="300" Width="300" 
                                     CornerRadius="300"
-                                    MouseUp="SelectImageFolderBt_MouseUp" Cursor="Hand">    
+                                    MouseUp="SelectImageFolderBt_MouseUp" Cursor="Hand" ToolTip="열기(Ctrl+O)">    
                                 <iconPacks:PackIconBoxIcons x:Name="DropIcon" Kind="RegularDownload" 
                                                             Width="140" Height="140" Foreground="#0097A7"
                                                             VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -66,19 +66,26 @@
                                 <MenuItem Header="새로고침" Click="RefreshBt_Click" InputGestureText="F5"/>
                                 <Separator/>
                                 <!--<MenuItem Header="설정" Click="SettingBt_Click" InputGestureText="Ctrl + ,"/>-->
-                                <MenuItem Header="종료" Click="ExitBt_Click" InputGestureText="Ctrl + W"/>
+                                <MenuItem Header="종료" Click="ExitBt_Click" InputGestureText="Ctrl + Q"/>
                             </MenuItem>
                             <MenuItem Header="편집" VerticalContentAlignment="Center" Focusable="False" Style="{StaticResource MaterialDesignMenuItem}">
                                 <MenuItem Header="전체선택해제" Click="AllDeselectBt_Click"/>
+                                <MenuItem x:Name="OnlySelectedShowBt" Header="선택한 사진만 보기" 
+                                          Click="OnlySelectedShowBt_Click" InputGestureText="Ctrl + S">
+                                    <!--<MenuItem.Icon>
+                                        <iconPacks:PackIconBoxIcons x:Name="OnlySelectedShowIcon" Kind="RegularCheck" 
+                                                                    Foreground="White" Margin="0" Padding="0" Width="30"/>
+                                    </MenuItem.Icon>-->
+                                </MenuItem>
                                 <Separator/>
-                                <MenuItem Header="섬네일추출" Click="ExportThumbnailBt_Click" InputGestureText="Ctrl + E"/>
+                                <MenuItem Header="섬네일추출(JPG)" Click="ExportThumbnailBt_Click" InputGestureText="Ctrl + E"/>
                                 <MenuItem Header="RAW파일복사" Click="RawCopyBt_Click" InputGestureText="Ctrl + R"/>
                                 <!--<MenuItem Header="분류" Click="FolderDivisionBt_Click" InputGestureText="Ctrl + D" IsEnabled="False"/>-->
                                 <!--<MenuItem Header="EXIF변경" Click="ExifChangeBt_Click" InputGestureText="Ctrl + I" IsEnabled="False"/>-->
                             </MenuItem>
-                            <MenuItem Header="도움말" VerticalContentAlignment="Center" Focusable="False" Style="{StaticResource MaterialDesignMenuItem}">
-                                <MenuItem Header="도움말보기" Click="AllDeselectBt_Click"/>
-                            </MenuItem>
+                            <!--<MenuItem Header="도움말" VerticalContentAlignment="Center" Focusable="False" Style="{StaticResource MaterialDesignMenuItem}">
+                                <MenuItem Header="도움말보기" Click="HelpBt_Click"/>
+                            </MenuItem>-->
                         </Menu>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

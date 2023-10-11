@@ -66,7 +66,32 @@
             <!--<TextBlock Text="20 Selected" HorizontalAlignment="Right" 
                        VerticalAlignment="Bottom"
                        Margin="50,0" Height="37"/>-->
-            <Grid HorizontalAlignment="Right" Margin="15,5">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="15,5">
+
+                <Button x:Name="PrevBt" Width="40" Padding="5" Height="40" 
+                    Click="PrevBt_Click" ToolTip="이전(왼쪽방향키)"
+                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                    <Button.Content>
+                        <iconPacks:PackIconBoxIcons x:Name="PrevIcon" Kind="RegularCaretLeft" 
+                                                Width="25" Height="25" Foreground="#EEEEEE"
+                                                VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Button.Content>
+                </Button>
+                
+                <Button x:Name="NextBt" Width="40" Padding="5" Height="40" 
+                    Click="NextBt_Click" ToolTip="다음(오른쪽방향키)"
+                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                    <Button.Content>
+                        <iconPacks:PackIconBoxIcons x:Name="NextIcon" Kind="RegularCaretRight" 
+                                                Width="25" Height="25" Foreground="#EEEEEE"
+                                                VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Button.Content>
+                </Button>
+
+                <Border Width="20"/>
+
                 <CheckBox x:Name="SelectCb" RenderTransformOrigin="0.5,0.5" 
                           Height="15" VerticalAlignment="Center" 
                           VerticalContentAlignment="Center"
@@ -79,7 +104,7 @@
                     </CheckBox.RenderTransform>
                 </CheckBox>
                 
-            </Grid>
+            </StackPanel>
         </Grid>
 
         <!--<ListView x:Name="MiniImgSp" Grid.Row="3" ItemTemplate="{StaticResource ImageItemTemplate}">

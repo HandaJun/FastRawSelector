@@ -54,6 +54,7 @@ namespace FastRawSelector.LOGIC
         public static SolidColorBrush DarkGrayBrush = new SolidColorBrush(Color.FromArgb(255, 33, 33, 33));
         public static SolidColorBrush TransBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
 
+        public static bool IsOnlySelectedShow = false;
 
         // 숫자만
         public static readonly Regex NotNumberRegex = new Regex("[^0-9]+");

@@ -28,7 +28,7 @@
             <Grid Background="#01000000" MouseDown="TitleGrid_MouseDown">
                 <Image Source="/FastRawSelector;component/FastRawSelector.ico" 
                        VerticalAlignment="Center" HorizontalAlignment="Left" Margin="13"/>
-                <TextBlock Text="섬네일추출" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="47,0" />
+                <TextBlock Text="섬네일추출 (JPG)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="47,0" />
                 <Button Click="CloseBt_Click"
                         Style="{StaticResource MaterialDesignFlatLightButton}" HorizontalAlignment="Right" Height="50">
                     <Button.Content>

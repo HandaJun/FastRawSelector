@@ -399,6 +399,11 @@ namespace FastRawSelector.LOGIC
                 }
                 else
                 {
+                    if (Common.IsOnlySelectedShow && !Common.NowSelectorSetting.SelectedSet.Contains(data.FileName))
+                    {
+                        continue;
+                    }
+
                     SetImage(data);
                     SetExif(data);
                     break;
@@ -431,6 +436,11 @@ namespace FastRawSelector.LOGIC
                 }
                 else
                 {
+                    if (Common.IsOnlySelectedShow && !Common.NowSelectorSetting.SelectedSet.Contains(data.FileName))
+                    {
+                        continue;
+                    }
+
                     SetImage(data);
                     SetExif(data);
                     break;
