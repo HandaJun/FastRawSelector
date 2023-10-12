@@ -15,7 +15,7 @@ namespace FastRawSelector.LOGIC
     public class LoadImage
     {
 
-        public static Dictionary<string, ImageData> ImageList = new Dictionary<string, ImageData>();
+        public static ConcurrentDictionary<string, ImageData> ImageList = new ConcurrentDictionary<string, ImageData>();
         public static ImageData NowImage = null;
         public static int NowIndex = -1;
         public static int LastIndex = -1;
@@ -86,7 +86,7 @@ namespace FastRawSelector.LOGIC
                 }
             }
 
-            ImageList = new Dictionary<string, ImageData>(tempDic);
+            ImageList = new ConcurrentDictionary<string, ImageData>(tempDic);
 
             UpdateSelectedCount();
 
@@ -387,27 +387,42 @@ namespace FastRawSelector.LOGIC
                     NextIamge();
                     break;
                 }
-                ImageData data = ImageList.ElementAt(NowIndex).Value;
-                if (data.IsNotImage)
+                try
                 {
-                    break;
-                }
-                if (data.ImageArray == null)
-                {
-                    GetThum(data, true);
-                    break;
-                }
-                else
-                {
-                    if (Common.IsOnlySelectedShow && !Common.NowSelectorSetting.SelectedSet.Contains(data.FileName))
+                    ImageData data = ImageList.ElementAt(NowIndex).Value;
+                    if (data.IsNotImage)
                     {
-                        continue;
+                        break;
                     }
+                    if (data.ImageArray == null)
+                    {
+                        GetThum(data, true);
+                        break;
+                    }
+                    else
+                    {
+                        if (Common.IsOnlySelectedShow)
+                        {
+                            if (Common.NowSelectorSetting.SelectedSet.Count == 0)
+                            {
+                                break;
+                            }
+                            else if (!Common.NowSelectorSetting.SelectedSet.Contains(data.FileName))
+                            {
+                                continue;
+                            }
+                        }
 
-                    SetImage(data);
-                    SetExif(data);
+                        SetImage(data);
+                        SetExif(data);
+                        break;
+                    }
+                }
+                catch (Exception)
+                {
                     break;
                 }
+                
             }
             NearLoad();
         }
@@ -415,6 +430,7 @@ namespace FastRawSelector.LOGIC
         public static void NextIamge(int step = 1)
         {
             Common.LastKeydown = DateTime.Now;
+            int tempIndex = NowIndex;
             while (true)
             {
                 NowIndex += step;
@@ -424,27 +440,43 @@ namespace FastRawSelector.LOGIC
                     PrevImage();
                     break;
                 }
-                ImageData data = ImageList.ElementAt(NowIndex).Value;
-                if (data.IsNotImage)
-                {
-                    break;
-                }
-                if (data.ImageArray == null)
-                {
-                    GetThum(data, true);
-                    break;
-                }
-                else
-                {
-                    if (Common.IsOnlySelectedShow && !Common.NowSelectorSetting.SelectedSet.Contains(data.FileName))
-                    {
-                        continue;
-                    }
 
-                    SetImage(data);
-                    SetExif(data);
+                try
+                {
+                    ImageData data = ImageList.ElementAt(NowIndex).Value;
+                    if (data.IsNotImage)
+                    {
+                        break;
+                    }
+                    if (data.ImageArray == null)
+                    {
+                        GetThum(data, true);
+                        break;
+                    }
+                    else
+                    {
+                        if (Common.IsOnlySelectedShow)
+                        {
+                            if (Common.NowSelectorSetting.SelectedSet.Count == 0)
+                            {
+                                break;
+                            }
+                            else if (!Common.NowSelectorSetting.SelectedSet.Contains(data.FileName))
+                            {
+                                continue;
+                            }
+                        }
+
+                        SetImage(data);
+                        SetExif(data);
+                        break;
+                    }
+                }
+                catch (Exception)
+                {
                     break;
                 }
+                
             }
             NearLoad();
         }

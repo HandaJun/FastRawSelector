@@ -32,7 +32,8 @@
             <Button x:Name="ExifBt" Width="40" Padding="5" Height="40" 
                     Click="ExifBt_Click" ToolTip="EXIF(I)"
                     VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                    Focusable="False"
+                    Style="{StaticResource MaterialDesignFlatDarkButton}">
                 <Button.Content>
                     <iconPacks:PackIconBoxIcons x:Name="ExifIcon" Kind="RegularInfoCircle" 
                                                 Width="25" Height="25" Foreground="#EEEEEE"
@@ -61,9 +62,10 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="15,5">
 
                 <Button x:Name="PrevBt" Width="40" Padding="5" Height="40" 
-                    Click="PrevBt_Click" ToolTip="이전(왼쪽방향키)"
-                    VerticalAlignment="Center" HorizontalAlignment="Center"
-                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                        Click="PrevBt_Click" ToolTip="이전(왼쪽방향키)"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Focusable="False"
+                        Style="{StaticResource MaterialDesignFlatDarkButton}">
                     <Button.Content>
                         <iconPacks:PackIconBoxIcons x:Name="PrevIcon" Kind="RegularCaretLeft" 
                                                 Width="25" Height="25" Foreground="#EEEEEE"
@@ -72,9 +74,10 @@
                 </Button>
 
                 <Button x:Name="NextBt" Width="40" Padding="5" Height="40" 
-                    Click="NextBt_Click" ToolTip="다음(오른쪽방향키)"
-                    VerticalAlignment="Center" HorizontalAlignment="Center"
-                                Style="{StaticResource MaterialDesignFlatDarkButton}">
+                        Click="NextBt_Click" ToolTip="다음(오른쪽방향키)"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Focusable="False"
+                        Style="{StaticResource MaterialDesignFlatDarkButton}">
                     <Button.Content>
                         <iconPacks:PackIconBoxIcons x:Name="NextIcon" Kind="RegularCaretRight" 
                                                 Width="25" Height="25" Foreground="#EEEEEE"

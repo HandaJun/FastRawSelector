@@ -27,6 +27,7 @@ namespace FastRawSelector.LOGIC
         public static string RootPath = AppDomain.CurrentDomain.BaseDirectory; // 실행파일이 있는 루트폴더
         public static string TempFolderPath = Path.Combine(RootPath, "TEMP"); // 임시폴더
         public static string BackupFolderPath = Path.Combine(RootPath, "BACKUP"); // 백업폴더
+        public static string EnviromentTempFolderPath = Path.GetFullPath(Environment.GetEnvironmentVariable("temp") + "\\");
 
         public static ViewEnum AgoView = ViewEnum.Single;
         public static ViewEnum NowView = ViewEnum.Single;
@@ -240,6 +241,10 @@ namespace FastRawSelector.LOGIC
         {
             try
             {
+                if (!path.Contains("\\"))
+                {
+                    path = Path.Combine(RootPath, path);
+                }
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -247,6 +252,30 @@ namespace FastRawSelector.LOGIC
             }
             catch (Exception)
             {
+                try
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(path);
+                    string batFileName = Path.Combine(EnviromentTempFolderPath, fileName + "Delete.bat");
+                    FileDelete(batFileName);
+
+                    string batchCommands = string.Empty;
+                    batchCommands += "@ECHO OFF\n";
+                    batchCommands += "ping 127.0.0.1 > nul\n";
+                    batchCommands += "echo j | del /F ";
+                    batchCommands += "\"" + path + "\"\n";
+                    batchCommands += "echo j | del \"" + batFileName + "\"";
+                    File.WriteAllText(batFileName, batchCommands);
+
+                    Process p = new Process();
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.FileName = batFileName;
+                    p.Start();
+                }
+                catch (Exception)
+                {
+                }
+              
             }
         }
 
@@ -458,6 +487,78 @@ namespace FastRawSelector.LOGIC
                 child.Left = screenBounds.Left + screenBounds.Width / 2 - child.Width / 2;
                 child.Top = screenBounds.Top + screenBounds.Height / 2 - child.Height / 2;
             }
+        }
+
+        static bool is64BitProcess = (IntPtr.Size == 8);
+        public static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
+
+        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWow64Process(
+            [In] IntPtr hProcess,
+            [Out] out bool wow64Process
+        );
+
+        public static bool InternalCheckIsWow64()
+        {
+            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) ||
+                Environment.OSVersion.Version.Major >= 6)
+            {
+                using (Process p = Process.GetCurrentProcess())
+                {
+                    bool retVal;
+                    if (!IsWow64Process(p.Handle, out retVal))
+                    {
+                        return false;
+                    }
+                    return retVal;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static Uri GetUri(string fileName)
+        {
+            return new Uri("pack://application:,,,/" + fileName);
+        }
+
+        public static Stream UriToStream(Uri uri)
+        {
+            return Application.GetResourceStream(uri).Stream;
+        }
+        public static Stream GetStreamFromResource(string fileName)
+        {
+            return UriToStream(GetUri(fileName));
+        }
+
+        public static void StreamToFile(Stream stream, string output)
+        {
+            using (FileStream fileStream = System.IO.File.Create(output, (int)stream.Length))
+            {
+                byte[] bytesInStream = new byte[stream.Length];
+                stream.Read(bytesInStream, 0, (int)bytesInStream.Length);
+                fileStream.Write(bytesInStream, 0, bytesInStream.Length);
+            }
+        }
+
+        public static void FileNameToFile(string fileName, string output)
+        {
+            Stream stream = GetStreamFromResource(fileName);
+            using (FileStream fileStream = System.IO.File.Create(output, (int)stream.Length))
+            {
+                byte[] bytesInStream = new byte[stream.Length];
+                stream.Read(bytesInStream, 0, (int)bytesInStream.Length);
+                fileStream.Write(bytesInStream, 0, bytesInStream.Length);
+            }
+            stream?.Close();
+        }
+
+        public static void FileNameToRoot(string fileName)
+        {
+            FileNameToFile(fileName, Path.Combine(RootPath, fileName));
         }
 
     }

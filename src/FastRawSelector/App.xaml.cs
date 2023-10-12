@@ -18,6 +18,17 @@ namespace FastRawSelector
             Setting = ApplicationSetting.Load();
             Setting.Save(false);
 
+            Common.FileNameToRoot("log4net.dat");
+            Common.FileNameToRoot("libraw.dll");
+            if (Common.is64BitOperatingSystem)
+            {
+                Common.FileNameToRoot("exiv2-ql-64.dll");
+            }
+            else
+            {
+                Common.FileNameToRoot("exiv2-ql-32.dll");
+            }
+
             new MainWindow(e.Args).Show();
         }
     }

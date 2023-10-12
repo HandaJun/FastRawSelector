@@ -105,6 +105,7 @@
 
                         <Button x:Name="GridViewBt" Width="40" Padding="5" Height="40" Visibility="Collapsed"
                                 Click="GridViewBt_Click"
+                                Focusable="False"
                                 Style="{StaticResource MaterialDesignFlatDarkButton}">
                             <Button.Content>
                                 <iconPacks:PackIconBoxIcons x:Name="GridViewIcon" Kind="RegularGrid" 
@@ -114,6 +115,7 @@
                         </Button>
                         <Button x:Name="SingleViewBt" Width="40" Padding="5" Height="40" 
                                 Click="SingleViewBt_Click" ToolTip="일반화면모드(F)"
+                                Focusable="False"
                                 Style="{StaticResource MaterialDesignFlatDarkButton}">
                             <Button.Content>
                                 <iconPacks:PackIconBoxIcons x:Name="SingleViewIcon" Kind="RegularSquare" 
@@ -123,6 +125,7 @@
                         </Button>
                         <Button x:Name="FullViewBt" Width="40" Padding="5" Height="40" 
                                 Click="FullViewBt_Click" ToolTip="전체화면모드(F)"
+                                Focusable="False"
                                 Style="{StaticResource MaterialDesignFlatDarkButton}">
                             <Button.Content>
                                 <iconPacks:PackIconBoxIcons x:Name="FullViewIcon" Kind="RegularFullscreen" 

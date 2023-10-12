@@ -282,6 +282,11 @@ namespace FastRawSelector
             {
                 ExportThumbnailWindow.GetInstance().Close();
                 RawCopyWindow.GetInstance().Close();
+
+                Common.FileDelete("exiv2-ql-32.dll");
+                Common.FileDelete("exiv2-ql-64.dll");
+                Common.FileDelete("libraw.dll");
+                Common.FileDelete("log4net.dat");
             }
             catch (Exception ex)
             {
