@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/HandaJun/FastRawSelector/releases/latest"><img src="https://img.shields.io/badge/⬇%20Download%20Latest-1.0.0-00BCD4?style=for-the-badge"/></a>
+  <a href="https://github.com/HandaJun/FastRawSelector/releases/latest"><img src="https://img.shields.io/badge/⬇%20Download%20Latest-1.0.3-00BCD4?style=for-the-badge"/></a>
 </p>
 
 ---
@@ -148,7 +148,7 @@ Only the **`src`** tree is the product source published here.
 
 ## License & third-party
 
-- Application: see [LICENSE](LICENSE)  
+- Application: **[GNU GPL v3](LICENSE)**  
 - Native stacks: **libraw**, **exiv2** (and related) — respect their licenses  
 - UI: MaterialDesignThemes, MahApps icon packs, etc. (NuGet)
 

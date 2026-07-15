@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/HandaJun/FastRawSelector/releases/latest"><img src="https://img.shields.io/badge/⬇%20最新版をダウンロード-1.0.0-00BCD4?style=for-the-badge"/></a>
+  <a href="https://github.com/HandaJun/FastRawSelector/releases/latest"><img src="https://img.shields.io/badge/⬇%20最新版をダウンロード-1.0.3-00BCD4?style=for-the-badge"/></a>
 </p>
 
 ---
@@ -148,7 +148,7 @@ src/
 
 ## ライセンス
 
-- アプリ: [LICENSE](LICENSE)  
+- アプリ: **[GNU GPL v3](LICENSE)**  
 - ネイティブ: **libraw**, **exiv2** など — 各ライセンスに従ってください  
 - UI: MaterialDesignThemes、MahApps アイコンなど（NuGet）
 

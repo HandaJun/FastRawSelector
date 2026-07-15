@@ -129,6 +129,7 @@ namespace FastRawSelector.LOGIC
                 { "MenuFileTime", "파일시간 변경" },
                 { "MenuHelp", "도움말" },
                 { "MenuShortcuts", "단축키" },
+                { "MenuLicenses", "오픈소스 라이선스" },
                 { "DropHint", "클릭 또는 파일을 끌어놓으세요" },
                 { "TipOpen", "열기(Ctrl+O)" },
                 { "TipGrid", "그리드 보기(G)" },
@@ -214,6 +215,10 @@ namespace FastRawSelector.LOGIC
                 { "HelpNavBody", "← / →     이전 / 다음 사진\nPgUp / PgDn  10장 이동\nHome / End  처음 / 마지막" },
                 { "HelpFileBody", "Ctrl + O   폴더 열기\nF5          새로고침\nCtrl + Q   종료\nCtrl + ,   설정\nF1          이 도움말\nCtrl + E   섬네일 추출\nCtrl + R   RAW 복사\nCtrl + D   폴더 분류\nCtrl + T   파일시간 변경\nCtrl + S   선택한 사진만 보기" },
                 { "HelpCustomBody", "{0}           선택 토글\n{1}           EXIF 표시 전환\n{2}           전체화면\nG           그리드 보기\nEsc         전체화면 해제" },
+
+                // Licenses
+                { "LicenseTitle", "오픈소스 라이선스" },
+                { "LicenseIntro", "왼쪽 목록에서 라이브러리를 선택하면 해당 라이선스 전문을 볼 수 있습니다." },
 
                 // Export
                 { "ExportTitle", "섬네일추출" },
@@ -359,6 +364,7 @@ namespace FastRawSelector.LOGIC
                 { "MenuFileTime", "ファイル日時の変更" },
                 { "MenuHelp", "ヘルプ" },
                 { "MenuShortcuts", "ショートカット" },
+                { "MenuLicenses", "オープンソースライセンス" },
                 { "DropHint", "クリックまたはファイルをドロップ" },
                 { "TipOpen", "開く(Ctrl+O)" },
                 { "TipGrid", "グリッド表示(G)" },
@@ -441,6 +447,9 @@ namespace FastRawSelector.LOGIC
                 { "HelpNavBody", "← / →     前 / 次の写真\nPgUp / PgDn  10枚移動\nHome / End  最初 / 最後" },
                 { "HelpFileBody", "Ctrl + O   フォルダを開く\nF5          更新\nCtrl + Q   終了\nCtrl + ,   設定\nF1          このヘルプ\nCtrl + E   サムネイル書き出し\nCtrl + R   RAWコピー\nCtrl + D   フォルダ分類\nCtrl + T   ファイル日時変更\nCtrl + S   選択した写真のみ" },
                 { "HelpCustomBody", "{0}           選択トグル\n{1}           EXIF表示切替\n{2}           全画面\nG           グリッド表示\nEsc         全画面解除" },
+
+                { "LicenseTitle", "オープンソースライセンス" },
+                { "LicenseIntro", "左側の一覧でライブラリを選ぶと、該当ライセンス全文を表示します。" },
 
                 { "ExportTitle", "サムネイル書き出し" },
                 { "ExportTitleFull", "サムネイル書き出し (JPG)" },
@@ -580,6 +589,7 @@ namespace FastRawSelector.LOGIC
                 { "MenuFileTime", "Change file times" },
                 { "MenuHelp", "Help" },
                 { "MenuShortcuts", "Shortcuts" },
+                { "MenuLicenses", "Open source licenses" },
                 { "DropHint", "Click or drop files here" },
                 { "TipOpen", "Open (Ctrl+O)" },
                 { "TipGrid", "Grid view (G)" },
@@ -662,6 +672,9 @@ namespace FastRawSelector.LOGIC
                 { "HelpNavBody", "← / →     Previous / next\nPgUp / PgDn  Jump 10\nHome / End  First / last" },
                 { "HelpFileBody", "Ctrl + O   Open folder\nF5          Refresh\nCtrl + Q   Exit\nCtrl + ,   Settings\nF1          This help\nCtrl + E   Export thumbnails\nCtrl + R   Copy RAW\nCtrl + D   Sort folders\nCtrl + T   Change file times\nCtrl + S   Selected only" },
                 { "HelpCustomBody", "{0}           Toggle select\n{1}           Toggle EXIF\n{2}           Fullscreen\nG           Grid view\nEsc         Exit fullscreen" },
+
+                { "LicenseTitle", "Open source licenses" },
+                { "LicenseIntro", "Select a library on the left to view its full license text." },
 
                 { "ExportTitle", "Export thumbnails" },
                 { "ExportTitleFull", "Export thumbnails (JPG)" },

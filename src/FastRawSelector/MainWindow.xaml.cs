@@ -780,6 +780,16 @@ namespace FastRawSelector
             FocusOut();
         }
 
+        private void LicenseBt_Click(object sender, RoutedEventArgs e)
+        {
+            var lw = new LicenseWindow
+            {
+                Owner = this
+            };
+            lw.ShowDialog();
+            FocusOut();
+        }
+
         private void FolderOpenBt_Click(object sender, RoutedEventArgs e)
         {
             OpenImageFolder();

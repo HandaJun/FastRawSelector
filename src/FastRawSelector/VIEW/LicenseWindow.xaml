@@ -1,0 +1,87 @@
+﻿<Window x:Class="FastRawSelector.VIEW.LicenseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        Background="{DynamicResource MaterialDesignPaper}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Title="Licenses"
+        Height="560" Width="720"
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown"
+        mc:Ignorable="d">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="IntroTb"
+                   TextWrapping="Wrap"
+                   Opacity="0.85"
+                   Margin="0,0,0,12"
+                   LineHeight="20"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 목록: code-behind 에서 Items.Add (바인딩 없음) -->
+            <ListBox x:Name="LibList"
+                     BorderThickness="1"
+                     BorderBrush="{DynamicResource AppPanelBorderBrush}"
+                     Background="{DynamicResource AppGridItemBgBrush}"
+                     SelectionChanged="LibList_SelectionChanged"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+
+            <Border Grid.Column="2"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource AppPanelBorderBrush}"
+                    Background="{DynamicResource AppGridItemBgBrush}"
+                    Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="DetailNameTb"
+                               FontSize="16"
+                               FontWeight="Medium"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,4"/>
+                    <TextBlock x:Name="DetailLicenseTb"
+                               Grid.Row="1"
+                               Foreground="{DynamicResource AppAccentBrush}"
+                               Margin="0,0,0,10"
+                               TextWrapping="Wrap"/>
+                    <ScrollViewer Grid.Row="2"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <TextBlock x:Name="DetailBodyTb"
+                                   TextWrapping="Wrap"
+                                   FontFamily="Consolas, Courier New, monospace"
+                                   FontSize="12"
+                                   LineHeight="18"
+                                   Opacity="0.9"/>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Button x:Name="CloseBt" Grid.Row="2" Content="Close" Width="100" HorizontalAlignment="Right"
+                Margin="0,16,0,0" IsDefault="True" IsCancel="True"
+                Click="CloseBt_Click"
+                Style="{StaticResource MaterialDesignRaisedButton}"/>
+    </Grid>
+</Window>

@@ -91,6 +91,7 @@
                                       SubmenuOpened="TopLevelMenuItem_SubmenuOpened"
                                       SubmenuClosed="TopLevelMenuItem_SubmenuClosed">
                                 <MenuItem Header="{DynamicResource Loc.MenuShortcuts}" Click="HelpBt_Click" InputGestureText="F1"/>
+                                <MenuItem Header="{DynamicResource Loc.MenuLicenses}" Click="LicenseBt_Click"/>
                             </MenuItem>
                         </Menu>
                     </StackPanel>

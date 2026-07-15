@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/HandaJun/FastRawSelector/releases/latest"><img src="https://img.shields.io/badge/⬇%20최신판%20다운로드-1.0.0-00BCD4?style=for-the-badge"/></a>
+  <a href="https://github.com/HandaJun/FastRawSelector/releases/latest"><img src="https://img.shields.io/badge/⬇%20최신판%20다운로드-1.0.3-00BCD4?style=for-the-badge"/></a>
 </p>
 
 ---
@@ -148,7 +148,7 @@ src/
 
 ## 라이선스
 
-- 앱: [LICENSE](LICENSE)  
+- 앱: **[GNU GPL v3](LICENSE)**  
 - 네이티브: **libraw**, **exiv2** 등 — 각 라이선스 준수  
 - UI: MaterialDesignThemes, MahApps 아이콘 등 (NuGet)
 
