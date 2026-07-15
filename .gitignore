@@ -1,4 +1,4 @@
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
@@ -10,7 +10,12 @@
 /src/FastRawSelector/bin/Release
 /src/FastRawSelector/obj
 
-# local artifacts
+# local / private (do not publish)
+/doc/
+/AGENTS.md
+/Agents.md
+/agents.md
+/dist/
 /src.zip
 /.gjc/
 /src/MigrationBackup/
