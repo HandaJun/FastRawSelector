@@ -61,7 +61,7 @@ FastRawSelector は、そのループ向けの **軽量 WPF ビューア**です
 ### アプリ
 - UI: **日本語 · 한국어 · English**  
 - エクスプローラー **送る / プログラムから開く**（任意）  
-- **GitHub Releases の更新確認**（設定で ON/OFF）  
+- **自動アップデート**（GitHub Releases、設定で ON/OFF）  
 - ウィンドウ位置・サイズ、最近のフォルダ  
 
 ---
@@ -75,8 +75,16 @@ FastRawSelector は、そのループ向けの **軽量 WPF ビューア**です
    **[.NET Framework 4.6.2+](https://dotnet.microsoft.com/download/dotnet-framework/net462)** をインストール  
 4. **Ctrl+O**、RAW をドラッグ、または「送る」でフォルダを開く  
 
-> **更新:** 新しい zip で `exe` を差し替え。  
-> 設定は `%AppData%\Roaming\FastRawSelector\` に残ります。
+### アップデート
+
+| | |
+|:--|:--|
+| **アプリ内** | **設定 → 今すぐアップデート確認**（または起動時チェック）。zip を取得 → 終了 → `exe` 差し替え → 自動再起動 |
+| **手動** | 新しい zip で `exe` を上書き |
+| **設定** | `%AppData%\Roaming\FastRawSelector\` に保存され、更新後も維持 |
+
+> 書き込み可能なフォルダへの配置を推奨します。  
+> `Program Files` などでは権限により自動差し替えが失敗することがあります。
 
 ---
 

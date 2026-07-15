@@ -61,7 +61,7 @@ FastRawSelector is a **lightweight WPF viewer** built for that loop:
 ### App
 - UI languages: **English · Korean · Japanese**  
 - Explorer **Send to** / Open with (optional)  
-- **Update check** against GitHub Releases (Settings toggle)  
+- **Auto-update** from GitHub Releases (optional; Settings toggle)  
 - Remember window size/position, last folder  
 
 ---
@@ -75,8 +75,16 @@ FastRawSelector is a **lightweight WPF viewer** built for that loop:
    **[.NET Framework 4.6.2+](https://dotnet.microsoft.com/download/dotnet-framework/net462)**  
 4. Open a folder (**Ctrl+O**), drag a RAW file, or use Explorer Send to  
 
-> **Updating:** download a newer zip and replace the `exe`.  
-> Settings live in `%AppData%\Roaming\FastRawSelector\` and are kept.
+### Updates
+
+| | |
+|:--|:--|
+| **In-app** | **Settings → Check for updates** (or on startup if enabled). Downloads the release zip, exits, replaces the `exe`, then restarts automatically. |
+| **Manual** | Download a newer zip and replace the `exe` yourself. |
+| **Settings** | Stay under `%AppData%\Roaming\FastRawSelector\` — not wiped by updates. |
+
+> Put the app in a folder you can write to (e.g. your user profile).  
+> Installs under `Program Files` may fail to replace the exe without elevation.
 
 ---
 
