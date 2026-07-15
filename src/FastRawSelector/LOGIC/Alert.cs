@@ -10,7 +10,7 @@ namespace FastRawSelector.LOGIC
     {
         public static async Task<object> Info(
             object messageBoxText,
-            string caption = "알림",
+            string caption = null,
             Action afterAct = null
             )
         {
@@ -29,11 +29,15 @@ namespace FastRawSelector.LOGIC
 
         public static Task<object> Show(
             object messageBoxText,
-            string caption = "알림",
+            string caption = null,
             MessageBoxButton button = MessageBoxButton.OK,
             AlertStateEnum state = AlertStateEnum.INFO
             )
         {
+            if (string.IsNullOrEmpty(caption))
+            {
+                caption = Loc.Get("AlertTitle");
+            }
             NotificationMessage msg = new NotificationMessage();
             if (button == MessageBoxButton.OK)
             {

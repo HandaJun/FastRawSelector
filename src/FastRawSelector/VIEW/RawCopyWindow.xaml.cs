@@ -15,7 +15,7 @@ namespace FastRawSelector.VIEW
     /// </summary>
     public partial class RawCopyWindow : Window
     {
-        private new bool IsLoaded = false;
+        private bool IsWindowReady = false;
         private string RawPath = null;
         private string JpegPath = null;
 
@@ -39,7 +39,7 @@ namespace FastRawSelector.VIEW
                 JpegPathOpenBt.IsEnabled = true;
 
             }
-            IsLoaded = true;
+            IsWindowReady = true;
         }
 
         public void ShowWindow(Window owner)
@@ -59,7 +59,7 @@ namespace FastRawSelector.VIEW
                 CopyTargetCb.SelectedIndex = 1;
                 JpegPathTb.IsEnabled = true;
                 JpegPathOpenBt.IsEnabled = true;
-                SelectedCbi.Content = $"선택한 사진";
+                SelectedCbi.Content = Loc.Get("CopySelected");
                 RawPathTb.Focus();
             }
             else
@@ -68,9 +68,12 @@ namespace FastRawSelector.VIEW
                 int selectedCount = 0;
                 if (Common.NowSelectorSetting != null)
                 {
-                    selectedCount = Common.NowSelectorSetting.SelectedSet.Count;
+                    lock (Common.NowSelectorSetting.SyncRoot)
+                    {
+                        selectedCount = Common.NowSelectorSetting.SelectedSet.Count;
+                    }
                 }
-                SelectedCbi.Content = $"선택한 사진 ({selectedCount}장 선택중)";
+                SelectedCbi.Content = Loc.Get("CopySelected") + " (" + selectedCount + ")";
                 if (selectedCount == 0)
                 {
                     SelectedCbi.IsEnabled = false;
@@ -86,7 +89,7 @@ namespace FastRawSelector.VIEW
         }
         private void CopyTargetCb_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (IsLoaded && e.AddedItems != null && e.AddedItems.Count > 0)
+            if (IsWindowReady && e.AddedItems != null && e.AddedItems.Count > 0)
             {
                 if (e.AddedItems[0] is ComboBoxItem cbi)
                 {
@@ -111,7 +114,7 @@ namespace FastRawSelector.VIEW
 
         private void JpegPathOpenBt_Click(object sender, RoutedEventArgs e)
         {
-            Common.GetFolder("JPEG폴더", JpegPathTb.Text, f =>
+            Common.GetFolder(Loc.Get("FolderPickerJpeg"), JpegPathTb.Text, f =>
             {
                 JpegPathTb.Text = f;
                 if (string.IsNullOrEmpty(CopyPathTb.Text))
@@ -124,7 +127,7 @@ namespace FastRawSelector.VIEW
 
         private void RawPathOpenBt_Click(object sender, RoutedEventArgs e)
         {
-            Common.GetFolder("RAW폴더", RawPathTb.Text, f =>
+            Common.GetFolder(Loc.Get("FolderPickerRaw"), RawPathTb.Text, f =>
             {
                 RawPathTb.Text = f;
             });
@@ -133,7 +136,7 @@ namespace FastRawSelector.VIEW
 
         private void CopyPathOpenBt_Click(object sender, RoutedEventArgs e)
         {
-            Common.GetFolder("복사위치", CopyPathTb.Text, f =>
+            Common.GetFolder(Loc.Get("FolderPickerCopy"), CopyPathTb.Text, f =>
             {
                 CopyPathTb.Text = f;
             });
@@ -144,7 +147,7 @@ namespace FastRawSelector.VIEW
         {
             if (string.IsNullOrEmpty(CopyPathTb.Text))
             {
-                WindowAlert("복사할 위치를 입력해주세요.");
+                WindowAlert(Loc.Get("CopyNeedPath"));
                 return;
             }
 
@@ -161,6 +164,7 @@ namespace FastRawSelector.VIEW
 
                 RawPath = RawPathTb.Text;
                 JpegPath = JpegPathTb.Text;
+                Log.Info($"RAW 복사 시작: kind={Kind}, path={copyPath}");
                 Task.Run(() =>
                 {
                     switch (Kind)
@@ -180,20 +184,42 @@ namespace FastRawSelector.VIEW
 
         public void SelectedCopy(string copyPath)
         {
-            if (Common.NowSelectorSetting == null && Common.NowSelectorSetting.SelectedSet.Count == 0)
+            if (Common.NowSelectorSetting == null)
             {
-                WindowAlert("선택한 사진이 없습니다.");
+                WindowAlert(Loc.Get("CopyNoSelected"));
                 return;
             }
 
-            int count = 0;
-            int allCount = Common.NowSelectorSetting.SelectedSet.Count;
-
-            foreach (var item in Common.NowSelectorSetting.SelectedSet)
+            List<string> selectedItems;
+            lock (Common.NowSelectorSetting.SyncRoot)
             {
+                if (Common.NowSelectorSetting.SelectedSet.Count == 0)
+                {
+                    WindowAlert(Loc.Get("CopyNoSelected"));
+                    return;
+                }
+                selectedItems = Common.NowSelectorSetting.SelectedSet.ToList();
+            }
+
+            int count = 0;
+            int failCount = 0;
+            int allCount = selectedItems.Count;
+            // Part 2: 폴더 세대 + 경로 스냅샷 (폴더 전환 중 잘못된 경로 복사 방지)
+            int folderGen = LoadImage.FolderGen;
+            string sourceDir = LoadImage.NowDir;
+            Log.Info($"RAW 선택 복사: target={allCount}, path={copyPath}");
+
+            foreach (var item in selectedItems)
+            {
+                if (folderGen != LoadImage.FolderGen)
+                {
+                    Log.Info($"RAW 선택 복사 취소(폴더 전환): done={count}/{allCount}, fail={failCount}");
+                    Common.Invoke(() => { CopyPb.Visibility = Visibility.Collapsed; });
+                    return;
+                }
                 try
                 {
-                    string sourcePath = Path.Combine(LoadImage.NowDir, item);
+                    string sourcePath = Path.Combine(sourceDir ?? "", item);
                     string targetPath = Path.Combine(copyPath, item);
                     if (!File.Exists(sourcePath))
                     {
@@ -203,27 +229,39 @@ namespace FastRawSelector.VIEW
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("エラー : " + ex.Message);
+                    failCount++;
+                    Log.Exception(ex);
                 }
                 Interlocked.Increment(ref count);
-                Common.Invoke(() =>
+                if (allCount > 0)
                 {
-                    CopyPb.Value = ((double)count / allCount) * 100d;
-                });
+                    Common.Invoke(() =>
+                    {
+                        try
+                        {
+                            CopyPb.Value = ((double)count / allCount) * 100d;
+                        }
+                        catch (Exception uiEx)
+                        {
+                            Log.Exception(uiEx);
+                        }
+                    });
+                }
             }
-            WindowAlert("복사완료했습니다.", true);
+            Log.Info($"RAW 선택 복사 완료: total={allCount}, fail={failCount}, path={copyPath}");
+            WindowAlert(Loc.Get("CopyDone"), true);
         }
 
         private void SpecifiedFolderCopy(string copyPath)
         {
             if (string.IsNullOrEmpty(RawPath) || !Directory.Exists(RawPath))
             {
-                WindowAlert("RAW폴더를 입력해주세요.");
+                WindowAlert(Loc.Get("CopyNeedRaw"));
                 return;
             }
             if (string.IsNullOrEmpty(JpegPath) || !Directory.Exists(JpegPath))
             {
-                WindowAlert("JPEG폴더를 입력해주세요.");
+                WindowAlert(Loc.Get("CopyNeedJpeg"));
                 return;
             }
 
@@ -233,9 +271,14 @@ namespace FastRawSelector.VIEW
                 List<string> rawFiles = Directory.GetFiles(RawPath, "*", SearchOption.TopDirectoryOnly).ToList();
 
                 int count = 0;
+                int failCount = 0;
                 int allCount = jpegFiles.Count;
+                int dop = LoadImage.PrefetchMaxDop;
+                Log.Info($"RAW 지정폴더 복사: jpeg={allCount}, maxDop={dop}, raw={RawPath}, path={copyPath}");
 
-                foreach (var jpegFullPath in jpegFiles)
+                // 파일 I/O 병렬 (Part 2). 지정 폴더는 ImageList 세대와 무관.
+                var opts = new ParallelOptions { MaxDegreeOfParallelism = dop };
+                Parallel.ForEach(jpegFiles, opts, (jpegFullPath) =>
                 {
                     try
                     {
@@ -249,20 +292,32 @@ namespace FastRawSelector.VIEW
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Interlocked.Increment(ref failCount);
+                        Log.Exception(ex);
                     }
                     Interlocked.Increment(ref count);
-                    Common.Invoke(() =>
+                    if (allCount > 0 && count % 5 == 0)
                     {
-                        CopyPb.Value = ((double)count / allCount) * 100d;
-                    });
-
-                }
-                WindowAlert("복사완료했습니다.", true);
+                        Common.Invoke(() =>
+                        {
+                            try
+                            {
+                                CopyPb.Value = ((double)count / allCount) * 100d;
+                            }
+                            catch (Exception uiEx)
+                            {
+                                Log.Exception(uiEx);
+                            }
+                        });
+                    }
+                });
+                Log.Info($"RAW 지정폴더 복사 완료: total={allCount}, fail={failCount}, path={copyPath}");
+                WindowAlert(Loc.Get("CopyDone"), true);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                WindowAlert("복사실패했습니다.", true);
+                Log.Exception(ex);
+                WindowAlert(Loc.Get("CopyFail"), true);
             }
         }
 

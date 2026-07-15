@@ -13,30 +13,35 @@
             <RowDefinition Height="48"/>
         </Grid.RowDefinitions>
 
+        <!-- 선택 시: 사진 뒤 배경만 물들임 (사진은 그대로) -->
         <Border x:Name="SelectedBd" Visibility="Collapsed"
-                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                Grid.RowSpan="2" BorderThickness="2" BorderBrush="Aqua"
-                Background="Transparent" 
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                Grid.RowSpan="2"
+                BorderThickness="3" BorderBrush="{DynamicResource AppAccentBrush}"
+                Background="{DynamicResource AppSelectedOverlayBrush}"
+                IsHitTestVisible="False"
                 />
-
         <Border Background="#01000000" MouseEnter="MainImg_MouseEnter"/>
-        <Image x:Name="MainImg" Grid.RowSpan="2" MouseEnter="MainImg_MouseEnter" Margin="2"></Image>
+        <Image x:Name="MainImg" Grid.RowSpan="2" MouseEnter="MainImg_MouseEnter" Margin="3"
+               Stretch="Uniform" />
+
         <Grid Grid.Row="0" Margin="5">
             <Border x:Name="ExifBd" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                    Background="#30000000" Width="Auto" Height="Auto" Margin="3,2"
+                    Background="{DynamicResource AppPhotoOverlayBgBrush}" Width="Auto" Height="Auto" Margin="3,2"
                     CornerRadius="3" Visibility="Visible">
                 <StackPanel Orientation="Vertical" Margin="8,8,8,10">
-                    <TextBlock x:Name="ExifTb" Text="" Foreground="White" TextAlignment="Right" FontSize="14" FontFamily="Meiryo"/>
+                    <TextBlock x:Name="ExifTb" Text="" Foreground="{DynamicResource AppPhotoOverlayFgBrush}" TextAlignment="Right" FontSize="14" FontFamily="Meiryo"/>
                 </StackPanel>
             </Border>
             <Button x:Name="ExifBt" Width="40" Padding="5" Height="40" 
-                    Click="ExifBt_Click" ToolTip="EXIF(I)"
+                    Click="ExifBt_Click" ToolTip="EXIF"
                     VerticalAlignment="Bottom" HorizontalAlignment="Right"
                     Focusable="False"
-                    Style="{StaticResource MaterialDesignFlatDarkButton}">
+                    Foreground="{DynamicResource AppExifIconBrush}"
+                    Style="{StaticResource MaterialDesignFlatButton}">
                 <Button.Content>
                     <iconPacks:PackIconBoxIcons x:Name="ExifIcon" Kind="RegularInfoCircle" 
-                                                Width="25" Height="25" Foreground="#EEEEEE"
+                                                Width="25" Height="25" Foreground="{DynamicResource AppExifIconBrush}"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </Button.Content>
             </Button>
@@ -53,8 +58,10 @@
 
         <Grid Grid.Row="1">
             <Grid HorizontalAlignment="Center" Margin="2">
-                <TextBlock x:Name="CountTb" Text="" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="White" FontSize="18"/>
-                <TextBlock x:Name="FileNameTb" Text="" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" FontSize="18"/>
+                <TextBlock x:Name="CountTb" Text="" VerticalAlignment="Top" HorizontalAlignment="Center"
+                           Foreground="{DynamicResource AppBottomLabelBrush}" FontSize="18"/>
+                <TextBlock x:Name="FileNameTb" Text="" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                           Foreground="{DynamicResource AppBottomLabelBrush}" FontSize="18"/>
             </Grid>
         </Grid>
 
@@ -62,25 +69,27 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="15,5">
 
                 <Button x:Name="PrevBt" Width="40" Padding="5" Height="40" 
-                        Click="PrevBt_Click" ToolTip="이전(왼쪽방향키)"
+                        Click="PrevBt_Click" ToolTip="{DynamicResource Loc.TipPrev}"
                         VerticalAlignment="Center" HorizontalAlignment="Center"
                         Focusable="False"
-                        Style="{StaticResource MaterialDesignFlatDarkButton}">
+                        Foreground="{DynamicResource AppIconBrush}"
+                        Style="{StaticResource MaterialDesignFlatButton}">
                     <Button.Content>
                         <iconPacks:PackIconBoxIcons x:Name="PrevIcon" Kind="RegularCaretLeft" 
-                                                Width="25" Height="25" Foreground="#EEEEEE"
+                                                Width="25" Height="25" Foreground="{DynamicResource AppIconBrush}"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Button.Content>
                 </Button>
 
                 <Button x:Name="NextBt" Width="40" Padding="5" Height="40" 
-                        Click="NextBt_Click" ToolTip="다음(오른쪽방향키)"
+                        Click="NextBt_Click" ToolTip="{DynamicResource Loc.TipNext}"
                         VerticalAlignment="Center" HorizontalAlignment="Center"
                         Focusable="False"
-                        Style="{StaticResource MaterialDesignFlatDarkButton}">
+                        Foreground="{DynamicResource AppIconBrush}"
+                        Style="{StaticResource MaterialDesignFlatButton}">
                     <Button.Content>
                         <iconPacks:PackIconBoxIcons x:Name="NextIcon" Kind="RegularCaretRight" 
-                                                Width="25" Height="25" Foreground="#EEEEEE"
+                                                Width="25" Height="25" Foreground="{DynamicResource AppIconBrush}"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Button.Content>
                 </Button>
@@ -90,7 +99,8 @@
                 <CheckBox x:Name="SelectCb" RenderTransformOrigin="0.5,0.5" 
                           Height="15" VerticalAlignment="Center" 
                           VerticalContentAlignment="Center"
-                          Focusable="False" ToolTip="선택(B)"
+                          Focusable="False" ToolTip="Select"
+                          Style="{StaticResource MaterialDesignCheckBox}"
                           PreviewMouseUp="SelectCb_MouseUp">
                     <CheckBox.RenderTransform>
                         <TransformGroup>

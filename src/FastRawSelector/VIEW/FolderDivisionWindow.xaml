@@ -3,80 +3,105 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FastRawSelector.VIEW"
-        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" 
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
-        TextElement.FontSize="18"
+        TextElement.FontSize="16"
         TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"       
-        Background="{DynamicResource MaterialDesignPaper}"
+        TextOptions.TextRenderingMode="Auto"
+        Background="Transparent"
         mc:Ignorable="d"
-        Title="폴더분류" Height="450" Width="900"
-        MinHeight="450" MaxHeight="450"
-        MinWidth="900" WindowStyle="ToolWindow"
+        Title="{DynamicResource Loc.DivisionTitle}" Height="312.154" Width="720"
+        MinHeight="350" MaxHeight="420"
+        MinWidth="600" WindowStyle="None"
         WindowStartupLocation="Manual" Loaded="Window_Loaded" Topmost="False"
-        Closing="Window_Closing" >
-    <Grid>
-        
-        <Grid Margin="10,30">
+        Closing="Window_Closing" AllowsTransparency="True">
+    <Border BorderBrush="{DynamicResource AppChromeBorderBrush}" BorderThickness="1" Background="{DynamicResource MaterialDesignPaper}" Margin="0">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="50"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="45"/>
-                <RowDefinition Height="80"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="110"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="분류할 폴더" Style="{StaticResource TitleStyle}" Grid.Row="0"/>
-            <TextBox x:Name="TargetPathTb" Height="30" Grid.Column="1" Grid.Row="0" Margin="0,0,70,0"
-                     TextChanged="TextBox_TextChanged"/>
-            <Button x:Name="TargetPathOpenBt" Content="열기" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right"
-                    Click="TargetPathOpenBt_Click" Style="{StaticResource MaterialDesignFlatDarkBgButton}"/>
-
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2"
-                        VerticalAlignment="Center" HorizontalAlignment="Center">
-                <CheckBox Content="카메라" Margin="30" RenderTransformOrigin="0.5,0.5">
-                    <CheckBox.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
-                        </TransformGroup>
-                    </CheckBox.RenderTransform>
-                </CheckBox>
-                <CheckBox Content="렌즈" Margin="30" RenderTransformOrigin="0.5,0.5">
-                    <CheckBox.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
-                        </TransformGroup>
-                    </CheckBox.RenderTransform>
-                </CheckBox>
-                <CheckBox Content="플래시" Margin="30" RenderTransformOrigin="0.5,0.5">
-                    <CheckBox.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
-                        </TransformGroup>
-                    </CheckBox.RenderTransform>
-                </CheckBox>
-
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2"
-                        VerticalAlignment="Center" HorizontalAlignment="Center">
-                <RadioButton Content="이동" Margin="10" IsChecked="true"/>
-                <RadioButton Content="복사" Margin="10"/>
-            </StackPanel>
-
-            <Grid Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                <Button Content="분류" Width="200" Height="60" Click="DivisionBt_Click"
-                            Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                            FontSize="18"/>
+            <Grid Background="#01000000" MouseDown="TitleGrid_MouseDown">
+                <Image Source="/FastRawSelector;component/FastRawSelector.ico"
+                       VerticalAlignment="Center" HorizontalAlignment="Left" Margin="13"/>
+                <TextBlock Text="{DynamicResource Loc.DivisionTitleFull}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="47,0"/>
+                <Button Click="CloseBt_Click"
+                        Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Height="50"
+                        Foreground="{DynamicResource AppTitleIconBrush}">
+                    <Button.Content>
+                        <iconPacks:PackIconBoxIcons Kind="RegularX"
+                                        Width="18" Height="18" Foreground="{DynamicResource AppTitleIconBrush}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Button.Content>
+                </Button>
             </Grid>
-        
+
+            <Grid Grid.Row="1" Margin="16,12,16,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{DynamicResource Loc.DivisionSource}" Style="{StaticResource TitleStyle}"/>
+                <ComboBox x:Name="SourceTargetCb" Grid.Column="1" SelectedIndex="0"
+                          Style="{StaticResource MaterialDesignComboBox}"
+                          SelectionChanged="SourceTargetCb_SelectionChanged">
+                    <ComboBoxItem x:Name="AllCbi" Content="{DynamicResource Loc.DivisionCurrentAll}" Tag="All"/>
+                    <ComboBoxItem x:Name="SelectedCbi" Content="{DynamicResource Loc.DivisionSelected}" Tag="Selected"/>
+                    <ComboBoxItem x:Name="SpecifiedCbi" Content="{DynamicResource Loc.DivisionSpecified}" Tag="SpecifiedFolder"/>
+                </ComboBox>
+
+                <TextBlock Text="{DynamicResource Loc.DivisionSourceFolder}" Style="{StaticResource TitleStyle}" Grid.Row="1"/>
+                <TextBox x:Name="SourcePathTb" Height="30" Grid.Column="1" Grid.Row="1" Margin="0,0,70,0"
+                         IsEnabled="False" TextChanged="TextBox_TextChanged"/>
+                <Button x:Name="SourcePathOpenBt" Content="{DynamicResource Loc.Open}" Grid.Column="1" Grid.Row="1"
+                        HorizontalAlignment="Right" IsEnabled="False"
+                        Click="SourcePathOpenBt_Click" Style="{StaticResource MaterialDesignRaisedButton}"/>
+
+                <TextBlock Text="{DynamicResource Loc.DivisionCriteria}" Style="{StaticResource TitleStyle}" Grid.Row="2"/>
+                <ComboBox x:Name="CriteriaCb" Grid.Column="1" Grid.Row="2" SelectedIndex="0"
+                          Style="{StaticResource MaterialDesignComboBox}">
+                    <ComboBoxItem x:Name="CritExtCbi" Content="{DynamicResource Loc.DivisionExt}" Tag="Extension"/>
+                    <ComboBoxItem x:Name="CritDateCbi" Content="{DynamicResource Loc.DivisionDate}" Tag="Date"/>
+                    <ComboBoxItem x:Name="CritCamCbi" Content="{DynamicResource Loc.DivisionCamera}" Tag="Camera"/>
+                    <ComboBoxItem x:Name="CritLensCbi" Content="{DynamicResource Loc.DivisionLens}" Tag="Lens"/>
+                </ComboBox>
+
+                <TextBlock Text="{DynamicResource Loc.DivisionOutput}" Style="{StaticResource TitleStyle}" Grid.Row="3"/>
+                <TextBox x:Name="OutputPathTb" Height="30" Grid.Column="1" Grid.Row="3" Margin="0,0,70,0"
+                         TextChanged="TextBox_TextChanged"/>
+                <Button Content="{DynamicResource Loc.Open}" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right"
+                        Click="OutputPathOpenBt_Click" Style="{StaticResource MaterialDesignRaisedButton}"/>
+
+                <TextBlock Text="{DynamicResource Loc.DivisionMode}" Style="{StaticResource TitleStyle}" Grid.Row="4"/>
+                <StackPanel Grid.Column="1" Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <RadioButton x:Name="CopyRb" Content="{DynamicResource Loc.DivisionCopy}" Margin="0,0,24,0" IsChecked="True"
+                                 Style="{StaticResource MaterialDesignRadioButton}"/>
+                    <RadioButton x:Name="MoveRb" Content="{DynamicResource Loc.DivisionMove}"
+                                 Style="{StaticResource MaterialDesignRadioButton}"/>
+                </StackPanel>
+
+                <Grid Grid.Row="5" Grid.ColumnSpan="2">
+                    <Button x:Name="DivisionBt" Content="{DynamicResource Loc.DivisionRun}" Width="200" Height="52"
+                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                            Click="DivisionBt_Click"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            FontSize="18"/>
+                    <ProgressBar x:Name="DivisionPb" VerticalAlignment="Bottom" Height="10"
+                                 Value="0" Maximum="100" Visibility="Collapsed"/>
+                </Grid>
+            </Grid>
         </Grid>
-        <ProgressBar x:Name="ExportPb" VerticalAlignment="Bottom" Height="10" Value="0" Maximum="100" Visibility="Visible"/>
-    </Grid>
+    </Border>
 </Window>

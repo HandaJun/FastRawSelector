@@ -1,0 +1,46 @@
+﻿<Window x:Class="FastRawSelector.VIEW.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        Background="{DynamicResource MaterialDesignPaper}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Title="Help"
+        Height="520" Width="460"
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown"
+        mc:Ignorable="d">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock x:Name="FileTitleTb" FontSize="16" FontWeight="Medium" Margin="0,0,0,6"/>
+                <TextBlock x:Name="FileKeysTb" Margin="0,0,0,12" LineHeight="22"/>
+
+                <TextBlock x:Name="NavTitleTb" FontSize="16" FontWeight="Medium" Margin="0,8,0,6"/>
+                <TextBlock x:Name="NavBodyTb" Margin="0,0,0,12" LineHeight="22"/>
+
+                <TextBlock x:Name="SelectTitleTb" FontSize="16" FontWeight="Medium" Margin="0,8,0,6"/>
+                <TextBlock x:Name="CustomKeysTb" Margin="0,0,0,12" LineHeight="22"/>
+
+                <TextBlock x:Name="DataTitleTb" FontSize="16" FontWeight="Medium" Margin="0,8,0,6"/>
+                <TextBlock x:Name="DataBodyTb" Opacity="0.85" TextWrapping="Wrap" LineHeight="20"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Button x:Name="CloseBt" Grid.Row="1" Content="Close" Width="100" HorizontalAlignment="Right"
+                Margin="0,16,0,0" IsDefault="True" IsCancel="True"
+                Click="CloseBt_Click"
+                Style="{StaticResource MaterialDesignRaisedButton}"/>
+    </Grid>
+</Window>

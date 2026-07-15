@@ -3,6 +3,12 @@ using System.Runtime.InteropServices;
 
 namespace FastRawSelector.LOGIC
 {
+    /// <summary>
+    /// libraw.dll P/Invoke 바인딩 (~40 DllImport, 마샬링 구조체, 콜백 델리게이트).
+    /// DLL 은 Common.InitNativeRuntime 이 AppData\native 에 추출 후 SetDllDirectory 로 검색.
+    /// 사용 후 libraw_close / libraw_dcraw_clear_mem 호출 필수(누수·AV 방지).
+    /// 유니코드 경로: libraw_open_wfile 사용.
+    /// </summary>
     public class RAWLib {
         private const string LibraryName = "libraw";
 
@@ -13,7 +19,6 @@ namespace FastRawSelector.LOGIC
             LIBRAW_OPIONS_NO_DATAERR_CALLBACK = 1 << 1
         }
 
-        [Flags]
         public enum LibRaw_errors : int {
             LIBRAW_SUCCESS = 0,
             LIBRAW_UNSPECIFIED_ERROR = -1,
@@ -70,25 +75,21 @@ namespace FastRawSelector.LOGIC
             LIBRAW_PROGRESS_TRESERVED2 = 1 << 30
         }
 
-        [Flags]
         public enum LibRaw_image_formats : int {
             LIBRAW_IMAGE_JPEG = 1,
             LIBRAW_IMAGE_BITMAP = 2
         };
 
-        [Flags]
         public enum LibRaw_output_formats : int {
             PPM = 0,
             TIFF = 1
         }
 
-        [Flags]
         public enum LibRaw_output_bps : int {
             BPS8 = 8,
             BPS16 = 16
         }
 
-        [Flags]
         public enum LibRaw_output_color : int {
             RAW = 0,
             SRGB = 1,
@@ -126,7 +127,6 @@ namespace FastRawSelector.LOGIC
             LIBRAW_CAPS_RPI6BY9 = 32
         }
 
-        [Flags]
         public enum LibRaw_interpolation_quality : int {
             LINEAR = 0,
             VNG = 1,
@@ -137,7 +137,6 @@ namespace FastRawSelector.LOGIC
             MODIFIED_AHD = 12
         }
 
-        [Flags]
         public enum LibRaw_highlight_mode : int {
             CLIP = 0,
             UNCLIP = 1,
@@ -151,14 +150,12 @@ namespace FastRawSelector.LOGIC
             REBUILD9 = 9
         }
 
-        [Flags]
         public enum LibRaw_FBDD_noise_reduction : int {
             NO_FBDD = 0,
             LIGHT_FBDD = 1,
             FULL_FBDD = 2
         }
 
-        [Flags]
         public enum LibRaw_cameramaker_index : uint {
             LIBRAW_CAMERAMAKER_Unknown = 0,
             LIBRAW_CAMERAMAKER_Agfa,

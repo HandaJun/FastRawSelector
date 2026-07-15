@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
 	<log4net>
-		<!-- Appender 設定 -->
-		<!-- DEBUG level -->
+		<!--
+		  로그 정책 (묶음 B)
+		  - root level 이 전체 하한을 결정한다. ApplicationSetting.LogLevel (INFO|DEBUG) 로 런타임 변경.
+		  - root=INFO(기본): DEBUG 메시지는 버려짐 → DEBUG_*.log 가 비대해지지 않음.
+		  - root=DEBUG: DebugAppender 에 DEBUG 만 기록. INFO/ERROR 는 각 appender 필터대로.
+		  - 출력 경로: 기동 시 Common.PatchLog4NetFilePaths 가 .\logs\ 를 AppData\logs\ 로 패치.
+		-->
+
+		<!-- DEBUG only (root 가 DEBUG 일 때만 기록) -->
 		<appender name="DebugAppender" type="log4net.Appender.RollingFileAppender">
 			<param name="File" value=".\logs\DEBUG" />
 			<param name="AppendToFile" value="true" />
@@ -18,7 +25,7 @@
 			</filter>
 		</appender>
 
-		<!-- INFO/WARN level -->
+		<!-- INFO / WARN -->
 		<appender name="InfoWarnAppender" type="log4net.Appender.RollingFileAppender">
 			<param name="File" value=".\logs\INFO" />
 			<param name="AppendToFile" value="true" />
@@ -34,7 +41,7 @@
 			</filter>
 		</appender>
 
-		<!-- ERROR/FATAL level -->
+		<!-- ERROR / FATAL -->
 		<appender name="ErrorFatalAppender" type="log4net.Appender.RollingFileAppender">
 			<param name="File" value=".\logs\ERROR" />
 			<param name="AppendToFile" value="true" />
@@ -50,7 +57,7 @@
 			</filter>
 		</appender>
 
-		<!--　Appender 指定 -->
+		<!-- 기본 INFO. 런타임에 Log.ApplyRootLevel 이 덮어씀 -->
 		<root>
 			<level value="INFO" />
 			<appender-ref ref="DebugAppender" />

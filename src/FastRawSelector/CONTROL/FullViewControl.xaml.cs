@@ -1,6 +1,5 @@
 ﻿using FastRawSelector.LOGIC;
 using FastRawSelector.MODEL;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,13 +8,27 @@ using System.Windows.Media.Imaging;
 namespace FastRawSelector.CONTROL
 {
     /// <summary>
-    /// Interaction logic for FullViewControl.xaml
+    /// 풀스크린 뷰: 이미지·EXIF·선택. 공통 로직은 ImageViewHelper (Part 3).
     /// </summary>
     public partial class FullViewControl : UserControl
     {
         public FullViewControl()
         {
             InitializeComponent();
+        }
+
+        /// <summary>설정 단축키에 맞춰 ToolTip 갱신.</summary>
+        public void RefreshHotkeyTooltips()
+        {
+            ImageViewHelper.RefreshHotkeyTooltips(SelectCb, ExifBt, PrevBt, NextBt);
+        }
+
+        /// <summary>테마 전환 후 아이콘/버튼 포그라운드 재연결.</summary>
+        public void ApplyThemeChrome()
+        {
+            ImageViewHelper.ApplyThemeChrome(
+                PrevBt, PrevIcon, NextBt, NextIcon, ExifBt, ExifIcon,
+                SelectedBd, CountTb, FileNameTb);
         }
 
         public void SetImage(BitmapImage bmpImage)
@@ -25,52 +38,18 @@ namespace FastRawSelector.CONTROL
 
         public void SetExif(ImageData data, int selectedCount = 0)
         {
-            SetCount(data.Index, selectedCount);
-
-            FileNameTb.Text = data.FileName;
-            if (App.Setting.IsExifVisible)
+            if (data == null)
             {
-                StringBuilder exifText = new StringBuilder();
-                if (data.IsRaw && data.Exif != null)
-                {
-                    foreach (var item in data.Exif)
-                    {
-                        //exifText.Append($"{item.Key} : {item.Value}\n");
-                        if (!string.IsNullOrEmpty(item.Value.Item2))
-                        {
-                            switch (item.Value.Item1)
-                            {
-                                case "Image Height":
-                                case "Image Width":
-                                case "Flash bias":
-                                case "White balance":
-                                case "Camera model":
-                                case "Aperture":
-                                case "Exposure bias":
-                                case "Exposure time":
-                                case "Flash":
-                                case "Focal length":
-                                case "ISO speed":
-                                case "Lens model":
-                                    exifText.Append($"{item.Value.Item1} : {item.Value.Item2}\n");
-                                    break;
-                            }
-                        }
-                        //Log.Info($"{item.Key} : {item.Value}");
-                    }
-                }
-                ExifTb.Text = exifText.ToString();
+                return;
             }
+            SetCount(data.Index, selectedCount);
+            FileNameTb.Text = data.FileName;
+            ExifTb.Text = ImageViewHelper.BuildExifText(data);
         }
 
         public void SetCount(int index, int selectedCount = 0)
         {
-            string count = (index + 1) + " / " + (LoadImage.LastIndex + 1);
-            if (selectedCount != 0)
-            {
-                count += " (" + selectedCount + "장 선택) ";
-            }
-            CountTb.Text = count;
+            CountTb.Text = ImageViewHelper.BuildCountText(index, selectedCount);
         }
 
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
@@ -80,8 +59,7 @@ namespace FastRawSelector.CONTROL
 
         public void SelectedUpdate(bool flg)
         {
-            SelectedBd.Visibility = flg ? Visibility.Visible : Visibility.Collapsed;
-            SelectCb.IsChecked = flg;
+            ImageViewHelper.ApplySelectedState(SelectedBd, SelectCb, flg);
         }
 
         private void SelectCb_MouseUp(object sender, MouseButtonEventArgs e)
@@ -111,7 +89,7 @@ namespace FastRawSelector.CONTROL
 
         private void NextBt_Click(object sender, RoutedEventArgs e)
         {
-            LoadImage.NextIamge();
+            LoadImage.NextImage();
         }
     }
 }

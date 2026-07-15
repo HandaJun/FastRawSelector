@@ -9,3 +9,10 @@
 /src/FastRawSelector/bin/Debug
 /src/FastRawSelector/bin/Release
 /src/FastRawSelector/obj
+
+# local artifacts
+/src.zip
+/.gjc/
+/src/MigrationBackup/
+*.user
+*.suo

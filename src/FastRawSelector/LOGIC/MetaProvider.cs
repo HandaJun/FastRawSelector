@@ -18,7 +18,6 @@
 //using ImageMagick;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -27,6 +26,11 @@ using static System.Runtime.InteropServices.Marshal;
 
 namespace FastRawSelector.LOGIC
 {
+    /// <summary>
+    /// exiv2-ql 네이티브 DLL 로 RAW EXIF·썸네일·방향·사이즈를 읽는다.
+    /// 사이즈 EXIF 키가 없으면 libraw open + get_iwidth/iheight 폴백 (demosaic 없음, P-5).
+    /// 출처: QuickLook MetaProvider (GPL-3.0 헤더 유지).
+    /// </summary>
     public class MetaProvider
     {
         private readonly SortedDictionary<string, (string, string)> exifDic =
@@ -37,10 +41,10 @@ namespace FastRawSelector.LOGIC
         public MetaProvider(string path)
         {
             _path = path;
-
-            GetExif();
+            // P-1: 생성자에서 EXIF 전체 파싱하지 않음. GetExif()/GetSize() 시 lazy.
         }
 
+        /// <summary>EXIF XML 을 파싱해 라벨/값 사전으로 캐시. 첫 호출 시에만 네이티브 I/O.</summary>
         public SortedDictionary<string, (string, string)> GetExif()
         {
             if (exifDic.Count != 0)
@@ -62,46 +66,105 @@ namespace FastRawSelector.LOGIC
                 var label = node.Attributes?["Label"]?.InnerText;
                 var value = node.InnerText;
 
-                exifDic.Add(key, (label, value));
+                if (!exifDic.ContainsKey(key))
+                {
+                    exifDic.Add(key, (label, value));
+                }
             }
 
             return exifDic;
         }
 
+        /// <summary>임베디드 썸네일 바이트. 없으면 빈 배열.</summary>
         public byte[] GetThumbnail()
         {
             return NativeMethods.GetThumbnail(_path) ?? new byte[0];
         }
 
-
-        public Size GetSize()
+        /// <summary>
+        /// 이미지 전체 크기. 회전 보정(RotateAndScale)에 원본 종횡비가 필요하므로 썸네일 픽셀과 별개.
+        /// allowExifLookup=true: 캐시된 EXIF _.Size 우선, 없으면 libraw.
+        /// allowExifLookup=false: EXIF XML 로드 없이 libraw open + 사이즈만 (프리패치 고속).
+        /// </summary>
+        public Size GetSize(bool allowExifLookup = true)
         {
-            exifDic.TryGetValue("_.Size.Width", out var w_);
-            exifDic.TryGetValue("_.Size.Height", out var h_);
+            int w = 0;
+            int h = 0;
 
-            if (int.TryParse(w_.Item2, out var w) && int.TryParse(h_.Item2, out var h))
+            if (allowExifLookup)
             {
-                return new Size(w, h);
+                if (exifDic.Count == 0)
+                {
+                    GetExif();
+                }
+                exifDic.TryGetValue("_.Size.Width", out var w_);
+                exifDic.TryGetValue("_.Size.Height", out var h_);
+                if (w_.Item2 != null && h_.Item2 != null
+                    && int.TryParse(w_.Item2, out w) && int.TryParse(h_.Item2, out h)
+                    && w > 0 && h > 0)
+                {
+                    return new Size(w, h);
+                }
             }
 
-            IntPtr handler = RAWLib.libraw_init(RAWLib.LibRaw_init_flags.LIBRAW_OPTIONS_NONE);
-            RAWLib.libraw_open_file(handler, _path);
-            var errc = 0;
-            var ptr = RAWLib.libraw_dcraw_make_mem_image(handler, ref errc);
-            var img = PtrToStructure<RAWLib.libraw_processed_image_t>(ptr);
+            // P-5: demosaic 없이 open 후 사이즈 메타만.
+            // 회전 판별에는 센서(raw) 크기가 안전 — iwidth 는 버전/플립에 따라 달라질 수 있음.
+            IntPtr handler = IntPtr.Zero;
+            try
+            {
+                handler = RAWLib.libraw_init(RAWLib.LibRaw_init_flags.LIBRAW_OPTIONS_NONE);
+                if (handler == IntPtr.Zero)
+                {
+                    return new Size(800, 600);
+                }
 
-            w = img.width;
-            h = img.height;
+                var err = RAWLib.libraw_open_wfile(handler, _path);
+                if (err != RAWLib.LibRaw_errors.LIBRAW_SUCCESS)
+                {
+                    return new Size(800, 600);
+                }
 
-            return w + h == 0 ? new Size(800, 600) : new Size(w, h);
+                // 미처리 센서 크기 우선 (Orientation 적용 전)
+                w = RAWLib.libraw_get_raw_width(handler);
+                h = RAWLib.libraw_get_raw_height(handler);
+                if (w <= 0 || h <= 0)
+                {
+                    try
+                    {
+                        RAWLib.libraw_adjust_sizes_info_only(handler);
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                    w = RAWLib.libraw_get_iwidth(handler);
+                    h = RAWLib.libraw_get_iheight(handler);
+                }
+
+                return (w <= 0 || h <= 0) ? new Size(800, 600) : new Size(w, h);
+            }
+            catch (Exception ex)
+            {
+                Log.ExceptionWithMsg(_path, ex);
+                return new Size(800, 600);
+            }
+            finally
+            {
+                if (handler != IntPtr.Zero)
+                {
+                    RAWLib.libraw_close(handler);
+                }
+            }
         }
 
+        /// <summary>EXIF Orientation (1~8). 실패 시 Undefined(0).</summary>
         public Orientation GetOrientation()
         {
             return (Orientation)NativeMethods.GetOrientation(_path);
         }
     }
 
+    /// <summary>exiv2-ql-32/64 프로세스 비트에 맞춰 DllImport. 두 패스(길이 조회 후 버퍼 채움).</summary>
     internal static class NativeMethods
     {
         private static readonly bool Is64 = Environment.Is64BitProcess;
@@ -121,7 +184,7 @@ namespace FastRawSelector.LOGIC
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Log.ExceptionWithMsg(file, e);
                 return string.Empty;
             }
         }
@@ -141,7 +204,7 @@ namespace FastRawSelector.LOGIC
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Log.ExceptionWithMsg(file, e);
                 return null;
             }
         }
@@ -154,7 +217,7 @@ namespace FastRawSelector.LOGIC
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Log.ExceptionWithMsg(file, e);
                 return 0;
             }
         }

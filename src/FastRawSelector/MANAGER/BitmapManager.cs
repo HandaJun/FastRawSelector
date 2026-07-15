@@ -11,20 +11,47 @@ using System.Windows.Media.Imaging;
 
 namespace FastRawSelector.MANAGER
 {
+    /// <summary>
+    /// 일반 비트맵(JPEG/PNG 등) 디코드. MetadataExtractor + System.Drawing 리사이즈 후 JPEG byte[].
+    /// AllowNotRawImage 가 켜진 폴더 로드 시 LoadImage 가 사용한다.
+    /// </summary>
     public class BitmapManager
     {
-        public static (byte[], List<MetadataExtractor.Directory>) GetBitmapArray(string path, double longEdge)
+        /// <summary>
+        /// 장변 longEdge 로 축소한 JPEG byte[] 와 (선택) 메타데이터 디렉터리.
+        /// loadExif=false 이면 리사이즈만 (프리패치 고속 경로, P-1).
+        /// </summary>
+        public static (byte[], List<MetadataExtractor.Directory>) GetBitmapArray(
+            string path, double longEdge, bool loadExif = true)
         {
             try
             {
-                var directories = ImageMetadataReader.ReadMetadata(path).ToList();
+                List<MetadataExtractor.Directory> directories = null;
+                if (loadExif)
+                {
+                    directories = ImageMetadataReader.ReadMetadata(path).ToList();
+                }
                 return (GetBytesFromImage(path, (int)longEdge), directories);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.ExceptionWithMsg(path, ex);
                 return (null, null);
             }
-            
+        }
+
+        /// <summary>메타데이터만 로드 (비트맵 EXIF 지연 로드용).</summary>
+        public static List<MetadataExtractor.Directory> GetExifOnly(string path)
+        {
+            try
+            {
+                return ImageMetadataReader.ReadMetadata(path).ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.ExceptionWithMsg(path, ex);
+                return null;
+            }
         }
 
         private static byte[] GetBytesFromImage(string imageFile, int longEdge)

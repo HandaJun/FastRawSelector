@@ -18,7 +18,7 @@ namespace FastRawSelector.VIEW
     public partial class ExportThumbnailWindow : Window
     {
 
-        private new bool IsLoaded = false;
+        private bool IsWindowReady = false;
         private string RawPath = null;
 
         private readonly static ExportThumbnailWindow _instance = new ExportThumbnailWindow();
@@ -46,7 +46,7 @@ namespace FastRawSelector.VIEW
                 ExportTargetCb.SelectedIndex = 2;
                 RawPathTb.IsEnabled = true;
                 RawPathOpenBt.IsEnabled = true;
-                SelectedCbi.Content = $"선택한 사진만";
+                SelectedCbi.Content = Loc.Get("ExportSelected");
                 RawPathTb.Focus();
             }
             else
@@ -56,9 +56,12 @@ namespace FastRawSelector.VIEW
                 int selectedCount = 0;
                 if (Common.NowSelectorSetting != null)
                 {
-                    selectedCount = Common.NowSelectorSetting.SelectedSet.Count;
+                    lock (Common.NowSelectorSetting.SyncRoot)
+                    {
+                        selectedCount = Common.NowSelectorSetting.SelectedSet.Count;
+                    }
                 }
-                SelectedCbi.Content = $"선택한 사진만 ({selectedCount}장 선택중)";
+                SelectedCbi.Content = Loc.Get("ExportSelected") + " (" + selectedCount + ")";
                 if (selectedCount == 0)
                 {
                     SelectedCbi.IsEnabled = false;
@@ -73,21 +76,35 @@ namespace FastRawSelector.VIEW
             }
         }
 
+        public void ApplyLanguage()
+        {
+            Title = Loc.Get("ExportTitle");
+            if (AllCbi != null)
+            {
+                AllCbi.Content = Loc.Get("ExportAll");
+            }
+            if (SpecifiedFolderCbi != null)
+            {
+                SpecifiedFolderCbi.Content = Loc.Get("ExportSpecified");
+            }
+        }
+
         public void ShowWindow(Window owner)
         {
+            ApplyLanguage();
             Common.MoveCenter(owner, this);
-            IsLoaded = false;
+            IsWindowReady = false;
             Show();
             Init();
             BringToFront();
-            IsLoaded = true;
+            IsWindowReady = true;
         }
 
         private void ExportBt_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(ExportPathTb.Text))
             {
-                WindowAlert("추출할 위치를 입력해주세요.");
+                WindowAlert(Loc.Get("ExportNeedPath"));
                 return;
             }
 
@@ -102,6 +119,7 @@ namespace FastRawSelector.VIEW
                 ExportPb.Visibility = Visibility.Visible;
                 string Kind = cbi.Tag.ToString();
                 RawPath = RawPathTb.Text;
+                Log.Info($"섬네일 추출 시작: kind={Kind}, path={exportPath}");
                 Task.Run(() =>
                   {
                       switch (Kind)
@@ -128,71 +146,133 @@ namespace FastRawSelector.VIEW
         public void AllExport(string exportPath)
         {
             int count = 0;
+            int failCount = 0;
+            // Part 2: 목록 스냅샷 + 폴더 세대 + DOP 상한 (AllLoad 와 동일 패턴)
+            int folderGen = LoadImage.FolderGen;
+            int dop = LoadImage.PrefetchMaxDop;
+            var snapshot = LoadImage.ImageList.ToList();
+            int allCount = snapshot.Count;
+            Log.Info($"섬네일 전체 추출: target={allCount}, maxDop={dop}, path={exportPath}");
 
-            int allCount = LoadImage.ImageList.Count;
-
-            Parallel.ForEach(LoadImage.ImageList, (f) =>
+            var opts = new ParallelOptions { MaxDegreeOfParallelism = dop };
+            try
             {
-                try
+                Parallel.ForEach(snapshot, opts, (f, state) =>
                 {
-                    var outJPEG = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileNameWithoutExtension(f.Value.Path) + ".jpg");
-                    if (!f.Value.IsNotImage && f.Value.ImageArray == null)
+                    if (folderGen != LoadImage.FolderGen)
                     {
-                        RawManager.RawToJpeg(f.Value.Path, LoadImage.size, outJPEG);
+                        state.Stop();
+                        return;
                     }
-                    else if (f.Value.ImageArray != null)
+                    try
                     {
-                        using (var ms = new MemoryStream(f.Value.ImageArray))
+                        var outJPEG = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileNameWithoutExtension(f.Value.Path) + ".jpg");
+                        if (!f.Value.IsNotImage && f.Value.ImageArray == null)
                         {
-                            using (var fs = new FileStream(outJPEG, FileMode.Create))
+                            RawManager.RawToJpeg(f.Value.Path, LoadImage.size, outJPEG);
+                        }
+                        else if (f.Value.ImageArray != null)
+                        {
+                            using (var ms = new MemoryStream(f.Value.ImageArray))
                             {
-                                ms.WriteTo(fs);
+                                using (var fs = new FileStream(outJPEG, FileMode.Create))
+                                {
+                                    ms.WriteTo(fs);
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Log.Exception(ex);
-                }
+                    catch (Exception ex)
+                    {
+                        Interlocked.Increment(ref failCount);
+                        Log.Exception(ex);
+                    }
 
-                Interlocked.Increment(ref count);
-                Common.Invoke(() =>
-                {
-                    ExportPb.Value = ((double)count / allCount) * 100d;
+                    Interlocked.Increment(ref count);
+                    if (allCount > 0)
+                    {
+                        Common.Invoke(() =>
+                        {
+                            try
+                            {
+                                ExportPb.Value = ((double)count / allCount) * 100d;
+                            }
+                            catch (Exception uiEx)
+                            {
+                                Log.Exception(uiEx);
+                            }
+                        });
+                    }
                 });
-            });
-            WindowAlert("추출완료했습니다.", true);
+            }
+            catch (Exception ex)
+            {
+                Log.Exception(ex);
+            }
 
+            if (folderGen != LoadImage.FolderGen)
+            {
+                Log.Info($"섬네일 전체 추출 취소(폴더 전환): done={count}/{allCount}, fail={failCount}");
+                Common.Invoke(() => { ExportPb.Visibility = Visibility.Collapsed; });
+                return;
+            }
+
+            Log.Info($"섬네일 전체 추출 완료: total={allCount}, fail={failCount}, path={exportPath}");
+            WindowAlert(Loc.Get("ExportDone"), true);
         }
 
         public void SelectedExport(string exportPath)
         {
-            if (Common.NowSelectorSetting == null && Common.NowSelectorSetting.SelectedSet.Count == 0)
+            if (Common.NowSelectorSetting == null)
             {
-                WindowAlert("선택한 사진이 없습니다.");
+                WindowAlert(Loc.Get("ExportNoSelected"));
                 return;
             }
 
-            int count = 0;
-            int allCount = Common.NowSelectorSetting.SelectedSet.Count;
-
-            foreach (var item in Common.NowSelectorSetting.SelectedSet)
+            List<string> selectedItems;
+            lock (Common.NowSelectorSetting.SyncRoot)
             {
+                if (Common.NowSelectorSetting.SelectedSet.Count == 0)
                 {
+                    WindowAlert(Loc.Get("ExportNoSelected"));
+                    return;
+                }
+                selectedItems = Common.NowSelectorSetting.SelectedSet.ToList();
+            }
+
+            int count = 0;
+            int failCount = 0;
+            int allCount = selectedItems.Count;
+            int folderGen = LoadImage.FolderGen;
+            int dop = LoadImage.PrefetchMaxDop;
+            // 선택 목록 스냅샷 후 Parallel (Part 2)
+            var work = new List<ImageData>();
+            foreach (var item in selectedItems)
+            {
+                var datas = LoadImage.ImageList.Where(d => d.Key.EndsWith(@"\" + item)).ToList();
+                if (datas.Count > 0)
+                {
+                    work.Add(datas[0].Value);
+                }
+            }
+            allCount = work.Count;
+            Log.Info($"섬네일 선택 추출: target={allCount}, maxDop={dop}, path={exportPath}");
+
+            var opts = new ParallelOptions { MaxDegreeOfParallelism = dop };
+            try
+            {
+                Parallel.ForEach(work, opts, (imgData, state) =>
+                {
+                    if (folderGen != LoadImage.FolderGen)
+                    {
+                        state.Stop();
+                        return;
+                    }
                     try
                     {
-                        var datas = LoadImage.ImageList.Where(d => d.Key.EndsWith(@"\" + item));
-
-                        ImageData imgData = null;
-                        if (datas.Count() > 0)
-                        {
-                            imgData = datas.ElementAt(0).Value;
-                        }
-
                         if (imgData == null)
                         {
-                            continue;
+                            return;
                         }
                         var outJPEG = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileNameWithoutExtension(imgData.Path) + ".jpg");
                         if (!imgData.IsNotImage && imgData.ImageArray == null)
@@ -212,24 +292,47 @@ namespace FastRawSelector.VIEW
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("エラー : " + ex.Message);
+                        Interlocked.Increment(ref failCount);
+                        Log.Exception(ex);
                     }
-                }
-                Interlocked.Increment(ref count);
-                Common.Invoke(() =>
-                {
-                    ExportPb.Value = ((double)count / allCount) * 100d;
+                    Interlocked.Increment(ref count);
+                    if (allCount > 0)
+                    {
+                        Common.Invoke(() =>
+                        {
+                            try
+                            {
+                                ExportPb.Value = ((double)count / allCount) * 100d;
+                            }
+                            catch (Exception uiEx)
+                            {
+                                Log.Exception(uiEx);
+                            }
+                        });
+                    }
                 });
             }
+            catch (Exception ex)
+            {
+                Log.Exception(ex);
+            }
 
-            WindowAlert("추출완료했습니다.", true);
+            if (folderGen != LoadImage.FolderGen)
+            {
+                Log.Info($"섬네일 선택 추출 취소(폴더 전환): done={count}/{allCount}, fail={failCount}");
+                Common.Invoke(() => { ExportPb.Visibility = Visibility.Collapsed; });
+                return;
+            }
+
+            Log.Info($"섬네일 선택 추출 완료: total={allCount}, fail={failCount}, path={exportPath}");
+            WindowAlert(Loc.Get("ExportDone"), true);
         }
 
         private void SpecifiedFolderExport(string exportPath)
         {
             if (string.IsNullOrEmpty(RawPath) || !Directory.Exists(RawPath))
             {
-                WindowAlert("RAW폴더를 입력해주세요.");
+                WindowAlert(Loc.Get("ExportNeedRaw"));
                 return;
             }
 
@@ -244,26 +347,55 @@ namespace FastRawSelector.VIEW
             }
 
             int count = 0;
+            int failCount = 0;
             int allCount = files.Count;
-            Parallel.ForEach(files, (f) =>
+            // 지정 폴더는 ImageList 와 무관 — 작업 세대 토큰으로 창 닫기/재시작 대응은 약함.
+            // DOP 만 AllLoad 와 맞춤 (Part 2).
+            int dop = LoadImage.PrefetchMaxDop;
+            Log.Info($"섬네일 지정폴더 추출: target={allCount}, maxDop={dop}, raw={RawPath}, path={exportPath}");
+            var opts = new ParallelOptions { MaxDegreeOfParallelism = dop };
+            try
             {
-                var outJPEG = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileNameWithoutExtension(f) + ".jpg");
-                RawManager.RawToJpeg(f, LoadImage.size, outJPEG);
-
-                Interlocked.Increment(ref count);
-                if (count % 10 == 0)
+                Parallel.ForEach(files, opts, (f) =>
                 {
-                    Common.Invoke(() =>
+                    try
                     {
-                        ExportPb.Value = ((double)count / allCount) * 100d;
-                    });
-                }
-            });
-            WindowAlert("추출완료했습니다.", true);
+                        var outJPEG = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileNameWithoutExtension(f) + ".jpg");
+                        RawManager.RawToJpeg(f, LoadImage.size, outJPEG);
+                    }
+                    catch (Exception ex)
+                    {
+                        Interlocked.Increment(ref failCount);
+                        Log.Exception(ex);
+                    }
+
+                    Interlocked.Increment(ref count);
+                    if (count % 10 == 0 && allCount > 0)
+                    {
+                        Common.Invoke(() =>
+                        {
+                            try
+                            {
+                                ExportPb.Value = ((double)count / allCount) * 100d;
+                            }
+                            catch (Exception uiEx)
+                            {
+                                Log.Exception(uiEx);
+                            }
+                        });
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Exception(ex);
+            }
+            Log.Info($"섬네일 지정폴더 추출 완료: total={allCount}, fail={failCount}, path={exportPath}");
+            WindowAlert(Loc.Get("ExportDone"), true);
         }
         private void ExportPathOpenBt_Click(object sender, RoutedEventArgs e)
         {
-            Common.GetFolder("출력위치", ExportPathTb.Text, f =>
+            Common.GetFolder(Loc.Get("FolderPickerOutput"), ExportPathTb.Text, f =>
             {
                 ExportPathTb.Text = f;
             });
@@ -272,7 +404,7 @@ namespace FastRawSelector.VIEW
 
         private void ExportTargetCb_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (IsLoaded && e.AddedItems != null && e.AddedItems.Count > 0)
+            if (IsWindowReady && e.AddedItems != null && e.AddedItems.Count > 0)
             {
                 if (e.AddedItems[0] is ComboBoxItem cbi)
                 {
@@ -296,7 +428,7 @@ namespace FastRawSelector.VIEW
 
         private void RawPathOpenBt_Click(object sender, RoutedEventArgs e)
         {
-            Common.GetFolder("RAW폴더", RawPathTb.Text, f =>
+            Common.GetFolder(Loc.Get("FolderPickerRaw"), RawPathTb.Text, f =>
             {
                 RawPathTb.Text = f;
                 if (string.IsNullOrEmpty(ExportPathTb.Text))
