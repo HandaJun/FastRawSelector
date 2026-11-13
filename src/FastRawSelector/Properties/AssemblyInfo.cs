@@ -6,11 +6,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("FastRawSelector")]
-[assembly: AssemblyDescription("samek86@gmail.com")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Junho Yuhn")]
+[assembly: AssemblyCompany("HandaJun")]
 [assembly: AssemblyProduct("FastRawSelector")]
-[assembly: AssemblyCopyright("Copyright © Junho Yuhn 2023")]
+[assembly: AssemblyCopyright("Copyright © HandaJun 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
